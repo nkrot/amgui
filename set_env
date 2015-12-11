@@ -1,0 +1,7 @@
+#
+# USAGE: cd to/this/directory; . set_env
+#
+# it makes possible running the applicaiton as follows:
+#  > ./app.pl
+
+export PERL5LIB=`pwd`/lib:$PERL5LIB
