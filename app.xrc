@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<resource xmlns="http://www.wxwindows.org/wxxrc" version="2.3.0.1">
+    <object class="wxFrame" name="MainFrame">
+        <style>wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL</style>
+        <size>500,300</size>
+        <title>AM-Gui</title>
+        <centered>1</centered>
+        <aui_managed>0</aui_managed>
+        <object class="wxButton" name="CloseButton">
+            <label>Close</label>
+            <default>0</default>
+        </object>
+    </object>
+</resource>
