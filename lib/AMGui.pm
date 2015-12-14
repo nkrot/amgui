@@ -1,15 +1,31 @@
 package AMGui;
+our $VERSION = '0.01';
 
 use 5.022000;
 use strict;
 use warnings;
 
-use base 'Wx::SimpleApp';
-
-use Wx;
-use Wx::XRC;
-
+use Wx 0.15 qw[:allclasses];
 use AMGui::MainFrame;
+
+use base qw(Wx::App);
+
+
+sub OnInit {
+    my( $self ) = shift;
+
+    Wx::InitAllImageHandlers();
+
+    my $mainFrame = AMGui::MainFrame->new();
+
+    $self->SetTopWindow($mainFrame);
+    $mainFrame->Show(1);
+
+    return 1;
+}
+
+1;
+
 
 ###require Exporter;
 ###use AutoLoader qw(AUTOLOAD);
@@ -33,39 +49,10 @@ use AMGui::MainFrame;
 ###	
 ###);
 
-our $VERSION = '0.01';
 
 # Preloaded methods go here.
 
 # Autoload methods go after =cut, and are processed by the autosplit program.
-
-#sub new {
-#	my $class = shift;
-#	my $self  = bless { @_ }, $class;
-#
-#	return $self;
-#}
-
-sub OnInit {
-    my $self = shift;
-
-    my $xrc = Wx::XmlResource->new();
-    $xrc->InitAllHandlers();
-    $xrc->Load('app.xrc');
-
-    my $frame = AMGui::MainFrame->new;
-    $xrc->LoadFrame($frame, undef, 'MainFrame');
-
-    $frame->Show;
-}
-
-#sub OnInit {
-#    my $self = shift;
-#
-#    my $frame = AMGui::MainFrame->new;
-#
-#    $frame->Show;
-#}
 
 
 1;
