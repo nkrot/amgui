@@ -7,6 +7,7 @@ use Wx::Locale gettext => '_T';
 use strict;
 use warnings;
 
+
 use base qw(AMGui::Base::MainFrame);
 
 sub new {
