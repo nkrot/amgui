@@ -17,6 +17,8 @@ sub new {
     Wx::Event::EVT_MENU($self, wxID_NEW,           \&onFileNew);
     Wx::Event::EVT_MENU($self, wxID_OPEN,          \&onFileOpen);
     Wx::Event::EVT_MENU($self, wxID_EXIT,          \&onFileQuit);
+
+    Wx::Event::EVT_MENU($self, wxID_ANY,           \&onRun);
     
     Wx::Event::EVT_MENU($self, wxID_HELP_CONTENTS, \&onHelpContents);
     Wx::Event::EVT_MENU($self, wxID_ABOUT,         \&onHelpAbout);
@@ -40,6 +42,12 @@ sub onFileOpen {
 sub onFileQuit {
     my ($self, $event) = @_;
     $self->Close(1);
+}
+
+sub onRun {
+    my ($self, $event) = @_;
+    warn "Event handler (onRun) not implemented";
+    $event->Skip;
 }
 
 sub onHelpContents {
