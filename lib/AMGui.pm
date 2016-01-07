@@ -1,7 +1,7 @@
 package AMGui;
 our $VERSION = '0.01';
 
-use 5.022000;
+#use 5.022000;
 use strict;
 use warnings;
 
