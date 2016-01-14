@@ -4,9 +4,9 @@ package AMGui::MainFrame;
 use Wx qw[:everything];
 use Wx::Locale gettext => '_T';
 
+use File::Slurp;
 use strict;
 use warnings;
-
 
 use base qw(AMGui::Base::MainFrame);
 
@@ -33,11 +33,48 @@ sub onFileNew {
     $event->Skip;
 }
 
+sub inform {
+    my ($self, $msg) = @_;
+    Wx::MessageBox($msg, "Informing that", Wx::wxOK);
+    return 1;
+}
 
 sub onFileOpen {
     my ($self, $event) = @_;
-    warn "Event handler (onFileOpen) not implemented";
-    $event->Skip;
+    
+    my $filedlg = Wx::FileDialog->new( $self,
+                                       'Open File',
+                                       '',            # Default directory
+                                       '',            # Default file
+                                       "CSV file (*.csv)|*.csv",
+                                       wxOPEN|wxFILE_MUST_EXIST);
+    # If the user really selected one
+    if ($filedlg->ShowModal==wxID_OK)
+    {
+        my $filename = $filedlg->GetPath;
+        
+        # load the file
+        
+        my @lines = read_file($filename, chomp => 1);
+        
+        #$self->inform("file " . $filename . " contains " . $#lines . " lines");
+        #$self->inform(@lines[0]);
+
+        # display
+        $self->{lbFileData}->Set(\@lines);
+        
+        # ex
+        #my $ID_LISTBOX = 4; 
+        #my @strings3 = ("First String", "Second String", "Third String", 
+        #        "Fourth String", "Fifth String", "Sixth String"); 
+        #my $listbox = Wx::ListBox->new($panel, $ID_LISTBOX, 
+        #      Wx::Point->new(200,200), Wx::Size->new(180,80), 
+        #      \@strings3, wxLB_SINGLE);
+        #/ex
+        
+    }
+    
+    return 1;
 }
 
 sub onFileQuit {
