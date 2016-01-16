@@ -52,26 +52,13 @@ sub onFileOpen {
     if ($filedlg->ShowModal==wxID_OK)
     {
         my $filename = $filedlg->GetPath;
-        
-        # load the file
-        
         my @lines = read_file($filename, chomp => 1);
+        @lines = map { s/\r$//; $_ } @lines;
         
         #$self->inform("file " . $filename . " contains " . $#lines . " lines");
-        #$self->inform(@lines[0]);
+        #$self->inform("<" . $lines[0] . ">");
 
-        # display
         $self->{lbFileData}->Set(\@lines);
-        
-        # ex
-        #my $ID_LISTBOX = 4; 
-        #my @strings3 = ("First String", "Second String", "Third String", 
-        #        "Fourth String", "Fifth String", "Sixth String"); 
-        #my $listbox = Wx::ListBox->new($panel, $ID_LISTBOX, 
-        #      Wx::Point->new(200,200), Wx::Size->new(180,80), 
-        #      \@strings3, wxLB_SINGLE);
-        #/ex
-        
     }
     
     return 1;
