@@ -1,15 +1,14 @@
 package AMGui;
+use base qw(Wx::App);
+
 our $VERSION = '0.01';
 
 use 5.022000;
 use strict;
 use warnings;
-
 use Wx 0.15 qw[:allclasses];
+
 use AMGui::MainFrame;
-
-use base qw(Wx::App);
-
 
 sub OnInit {
     my( $self ) = shift;
