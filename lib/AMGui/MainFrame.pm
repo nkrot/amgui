@@ -8,7 +8,7 @@ use strict;
 use warnings;
 
 use AMGui::Constants;
-#use AMGui::DataFile;
+use AMGui::DataFileTab;
 
 sub new {
     my( $self, $parent, $id, $title, $pos, $size, $style, $name ) = @_;
@@ -52,23 +52,15 @@ sub onFileOpen {
     # If the user really selected a file
     if ($fileDlg->ShowModal == wxID_OK)
     {
-        
         my $filePath = $fileDlg->GetPath;
-
-#        my $dataFile = AMGui::DataFile->new($filePath, $self->{rightWindow});
-        
-        my @lines = read_file($filePath, chomp => 1);
-        @lines = map { s/\r$//; $_ } @lines;
-        
-        #$self->inform("file " . $filePath . " contains " . $#lines . " lines");
-        #$self->inform("<" . $lines[0] . ">");
-
-        $self->{lbFileData}->Set(\@lines);
- 
-        # set the tab name
         my $fileName = $fileDlg->GetFilename;
-        my $nb = $self->{rightWindow};
-        $nb->SetPageText(0, $fileName);
+
+        # TODO: how Padre stores and accesses tabs?
+        # TODO: store $dataFile (listBox) somewhere.
+        #  $self->{lbFileData} = $dataFile
+        # in onRun, need to access 1) selected line 2) all lines
+
+        my $dataFile = AMGui::DataFileTab->new($fileDlg, $self->{rightWindow});
     }
     
     return 1;
