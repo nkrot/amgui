@@ -32,6 +32,10 @@
                 <menu label="&amp;Edit" name="">
                 </menu>
                 <menu label="&amp;Run" name="">
+                    <item>
+                        <label>&amp;Run AM\tCtrl+R</label>
+                        <id>wxID_RUN</id>
+                    </item>
                 </menu>
                 <menu label="&amp;Help" name="">
                     <item>
@@ -72,6 +76,7 @@
                     <object class="wxNotebook" name="rightWindow" base="EditNotebook">
                         <style>wxNB_TOP</style>
                         <tabs>
+                            <tab window="lbFileData">NoFile</tab>
                         </tabs>
                         <object class="wxListBox" name="lbFileData" base="EditListBox">
                             <style>wxLB_SINGLE</style>

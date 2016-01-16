@@ -1,14 +1,14 @@
 package AMGui::MainFrame;
+use base qw(AMGui::Base::MainFrame);
 
-#use Wx qw[:allclasses];
 use Wx qw[:everything];
 use Wx::Locale gettext => '_T';
-
 use File::Slurp;
 use strict;
 use warnings;
 
-use base qw(AMGui::Base::MainFrame);
+use AMGui::Constants;
+#use AMGui::DataFile;
 
 sub new {
     my( $self, $parent, $id, $title, $pos, $size, $style, $name ) = @_;
@@ -19,7 +19,7 @@ sub new {
     Wx::Event::EVT_MENU($self, wxID_OPEN,          \&onFileOpen);
     Wx::Event::EVT_MENU($self, wxID_EXIT,          \&onFileQuit);
 
-    Wx::Event::EVT_MENU($self, wxID_ANY,           \&onRun);
+    Wx::Event::EVT_MENU($self, wxID_RUN,           \&onRun);
     
     Wx::Event::EVT_MENU($self, wxID_HELP_CONTENTS, \&onHelpContents);
     Wx::Event::EVT_MENU($self, wxID_ABOUT,         \&onHelpAbout);
@@ -48,16 +48,19 @@ sub onFileOpen {
                                        '',            # Default file
                                        "CSV file (*.csv)|*.csv",
                                        wxOPEN|wxFILE_MUST_EXIST);
-    # If the user really selected one
-    if ($fileDlg->ShowModal==wxID_OK)
+
+    # If the user really selected a file
+    if ($fileDlg->ShowModal == wxID_OK)
     {
         
         my $filePath = $fileDlg->GetPath;
+
+#        my $dataFile = AMGui::DataFile->new($filePath, $self->{rightWindow});
         
         my @lines = read_file($filePath, chomp => 1);
         @lines = map { s/\r$//; $_ } @lines;
         
-        #$self->inform("file " . $filepath . " contains " . $#lines . " lines");
+        #$self->inform("file " . $filePath . " contains " . $#lines . " lines");
         #$self->inform("<" . $lines[0] . ">");
 
         $self->{lbFileData}->Set(\@lines);
@@ -78,8 +81,16 @@ sub onFileQuit {
 
 sub onRun {
     my ($self, $event) = @_;
-    warn "Event handler (onRun) not implemented";
-    $event->Skip;
+    
+    # TODO
+    # if no data was loaded, report it via a dialog
+    # if no item was selected, warn that a random item will be selected
+    #    and report the random item somewhere
+    #if ($self->{lbFileData})
+    
+    $self->inform("I am running");
+
+    return 1;
 }
 
 sub onHelpContents {
