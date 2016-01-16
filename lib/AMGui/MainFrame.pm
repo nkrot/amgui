@@ -42,23 +42,30 @@ sub inform {
 sub onFileOpen {
     my ($self, $event) = @_;
     
-    my $filedlg = Wx::FileDialog->new( $self,
+    my $fileDlg = Wx::FileDialog->new( $self,
                                        'Open File',
                                        '',            # Default directory
                                        '',            # Default file
                                        "CSV file (*.csv)|*.csv",
                                        wxOPEN|wxFILE_MUST_EXIST);
     # If the user really selected one
-    if ($filedlg->ShowModal==wxID_OK)
+    if ($fileDlg->ShowModal==wxID_OK)
     {
-        my $filename = $filedlg->GetPath;
-        my @lines = read_file($filename, chomp => 1);
+        
+        my $filePath = $fileDlg->GetPath;
+        
+        my @lines = read_file($filePath, chomp => 1);
         @lines = map { s/\r$//; $_ } @lines;
         
-        #$self->inform("file " . $filename . " contains " . $#lines . " lines");
+        #$self->inform("file " . $filepath . " contains " . $#lines . " lines");
         #$self->inform("<" . $lines[0] . ">");
 
         $self->{lbFileData}->Set(\@lines);
+ 
+        # set the tab name
+        my $fileName = $fileDlg->GetFilename;
+        my $nb = $self->{rightWindow};
+        $nb->SetPageText(0, $fileName);
     }
     
     return 1;
