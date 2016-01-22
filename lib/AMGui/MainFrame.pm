@@ -13,6 +13,7 @@ use File::Spec;
 
 use AMGui::Constant;
 use AMGui::Notebook;
+use AMGui::DataSet;
 use AMGui::DataFileTab;
 
 sub new {
@@ -180,10 +181,16 @@ Setup a new tab / buffer and open C<$file>, then update the GUI.
 
 sub setup_data_viewer {
     my ($self, $file) = @_;
-    # TODO: working here &&&
     
-    # text data
-    #my $dataset = AMGui::DataSet->new($file);
+    # exemplars from file
+    my %args = (
+        path   => $file,
+        format => 'commas'  # TODO: set it from GUI control or form file extension
+    );
+    my $dataset = AMGui::DataSet->new(%args);
+    warn "Dataset size: " . $dataset->{data}->size #TODO make it work. " also " . $dataset->size;
+    warn "Source file: " . $dataset->path;
+    #warn "Classes: " . $dataset->classes;
     
     # GUI
     #my $data_viewer = AMGui::DataViewer->new($self->notebook);
