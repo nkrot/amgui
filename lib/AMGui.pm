@@ -8,14 +8,14 @@ use strict;
 use warnings;
 use Wx 0.15 qw[:allclasses];
 
-use AMGui::MainFrame;
+use AMGui::Wx::MainFrame;
 
 sub OnInit {
     my( $self ) = shift;
 
     Wx::InitAllImageHandlers();
 
-    my $mainFrame = AMGui::MainFrame->new();
+    my $mainFrame = AMGui::Wx::MainFrame->new();
 
     $self->SetTopWindow($mainFrame);
     $mainFrame->Show(1);
