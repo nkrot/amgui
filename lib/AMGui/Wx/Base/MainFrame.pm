@@ -12,7 +12,8 @@ use Wx::Locale gettext => '_T';
 # begin wxGlade: extracode
 # end wxGlade
 
-package AMGui::Base::MainFrame;
+package AMGui::Wx::Base::MainFrame;
+use AMGui::Wx::Notebook;
 
 use Wx qw[:everything];
 use base qw(Wx::Frame);
@@ -65,7 +66,7 @@ sub new {
     $self->{mainFrame_statusbar} = $self->CreateStatusBar(1);
     $self->{window_1} = Wx::SplitterWindow->new($self, wxID_ANY);
     $self->{leftWindow} = Wx::Panel->new($self->{window_1}, wxID_ANY);
-    $self->{notebook} = AMGui::Notebook->new($self->{window_1}, wxID_ANY);
+    $self->{notebook} = AMGui::Wx::Notebook->new($self->{window_1}, wxID_ANY);
     $self->{lbFileData} = Wx::ListBox->new($self->{notebook}, wxID_ANY, wxDefaultPosition, wxDefaultSize, [_T("Load data from a file")], wxLB_MULTIPLE);
 
     $self->__set_properties();
