@@ -18,13 +18,21 @@ sub new {
 
     $style = wxNB_TOP unless defined $style;
 
+    my @help = (
+        "== USAGE ==",
+        "Open a file in 'commas' format. File/Open or Ctrl-O",
+        "Once it is loaded, double click an item"
+    );
+
     $self = $self->SUPER::new( $parent, $id, $pos, $size, $style, $name );
-    $self->{lbFileData} = Wx::ListBox->new($self, 
-                                            wxID_ANY, 
-                                            wxDefaultPosition,
-                                            wxDefaultSize, 
-                                            [_T("Load data 2 from a file")],
-                                            wxLB_SINGLE);
+    $self->{help} = Wx::ListBox->new(
+        $self, 
+        wxID_ANY, 
+        wxDefaultPosition,
+        wxDefaultSize, 
+        \@help,
+        wxLB_SINGLE
+    );
 
     $self->__set_properties();
     $self->__do_layout();
@@ -35,8 +43,8 @@ sub new {
 
 sub __set_properties {
     my $self = shift;
-    $self->AddPage($self->{lbFileData}, _T("NoFile"));
-    $self->{lbFileData}->SetSelection(0);
+    $self->AddPage($self->{help}, _T("Usage"));
+    $self->{help}->SetSelection(0);
 }
 
 sub __do_layout {
