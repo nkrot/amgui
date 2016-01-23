@@ -35,6 +35,7 @@ sub new {
 
 use Class::XSAccessor {
     getters => {
+        data     => 'data',      # instance of AM::DataSet
         path     => 'path',      # full/path/to/filename
         format   => 'format',    # data formats available in AM::DataSet
         filename => 'filename',  # last portion of the path: filename
