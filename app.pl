@@ -6,15 +6,13 @@
 
 package main;
 
+use 5.022000;
 use strict;
 use warnings;
 
 use AMGui;
 
 unless(caller){
-#    my $local = Wx::Locale->new("English", "en", "en"); # replace with ??
-#    $local->AddCatalog("AMGui"); # replace with the appropriate catalog name
-
     my $app = AMGui->new();
     $app->MainLoop();
 }
