@@ -1,4 +1,4 @@
-package AMGui::Notebook;
+package AMGui::Wx::Notebook;
 use base qw(Wx::Notebook);
 
 use 5.022000;
