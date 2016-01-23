@@ -11,6 +11,7 @@ use File::Slurp;
 use File::Spec;
 
 
+use AMGui::AM;
 use AMGui::Constant;
 use AMGui::DataSet;
 use AMGui::Wx::Notebook;
@@ -185,15 +186,19 @@ sub setup_data_viewer {
     # load exemplars from file
     my %args = (
         path   => $file,
-        format => 'commas'  # TODO: set it from GUI control or form file extension
+        format => 'commas'  # TODO: set it from GUI control or from file extension?
     );
     my $dataset = AMGui::DataSet->new(%args);
     
-    # GUI component for showing exemplars
-    my $data_viewer = AMGui::DatasetViewer->new($self->notebook, $dataset);
-    #$data_viewer->set_dataset($dataset);
-    #$dataset->set_viewer($data_viewer);
+    # an instance of AM classifier
+    my $classifier = AMGui::AM->new;
     
+    # GUI component for showing exemplars and running the classifier
+    my $data_viewer = AMGui::DatasetViewer->new($self->notebook, $dataset);
+    #$data_dataset->set_dataset($dataset);
+    $data_viewer->set_classifier($classifier);
+    
+    #$dataset->set_viewer($data_viewer); # ???
 
     # my old code
     # TODO: how Padre stores and accesses tabs?
