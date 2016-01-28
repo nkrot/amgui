@@ -65,7 +65,7 @@ sub new {
     $self->{mainFrame_statusbar} = $self->CreateStatusBar(1);
     $self->{window_1} = Wx::SplitterWindow->new($self, wxID_ANY);
     $self->{grid_1} = Wx::Grid->new($self->{window_1}, wxID_ANY);
-    $self->{notebook} = AMGui::Wx::Notebook->new($self->{window_1}, wxID_ANY);
+    #$self->{notebook} = AMGui::Wx::Notebook->new($self->{window_1}, wxID_ANY);
 
     $self->__set_properties();
     $self->__do_layout();
@@ -101,7 +101,7 @@ sub __do_layout {
     my $self = shift;
     # begin wxGlade: AMGui::Wx::Base::MainFrame::__do_layout
     $self->{sizer_1} = Wx::BoxSizer->new(wxHORIZONTAL);
-    $self->{window_1}->SplitVertically($self->{grid_1}, $self->{notebook}, );
+    #$self->{window_1}->SplitVertically($self->{grid_1}, $self->{notebook}, );
     $self->{sizer_1}->Add($self->{window_1}, 1, wxEXPAND, 0);
     $self->SetSizer($self->{sizer_1});
     $self->Layout();
