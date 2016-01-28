@@ -14,6 +14,7 @@ use AMGui::AM;
 use AMGui::Constant;
 use AMGui::DataSet;
 use AMGui::Wx::AuiManager;
+use AMGui::Wx::Menubar;
 use AMGui::Wx::Notebook;
 use AMGui::Wx::DatasetViewer;
 
@@ -27,6 +28,10 @@ sub new {
     $self->{aui} = AMGui::Wx::AuiManager->new($self);
 
     $self->{cwd} = Cwd::cwd();
+
+    $self->{menu} = AMGui::Wx::Menubar->new($self);
+    #$self->SetMenuBar($self->{menu}->wx); #TODO: what is it?
+    $self->SetMenuBar($self->{menu});
 
     # Have to rebind the handlers here
     Wx::Event::EVT_MENU($self, wxID_NEW,           \&onFileNew);
