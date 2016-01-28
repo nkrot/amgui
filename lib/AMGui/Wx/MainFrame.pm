@@ -10,17 +10,21 @@ use Cwd ();
 use File::Slurp;
 use File::Spec;
 
-
 use AMGui::AM;
 use AMGui::Constant;
 use AMGui::DataSet;
+use AMGui::Wx::AuiManager;
 use AMGui::Wx::Notebook;
 use AMGui::Wx::DatasetViewer;
+
+#our @ISA        = qw{};
 
 sub new {
     my( $self, $parent, $id, $title, $pos, $size, $style, $name ) = @_;
     $self = $self->SUPER::new( $parent, $id, $title, $pos, $size, $style, $name );
     $self->SetTitle("AM Gui");
+
+    $self->{aui} = AMGui::Wx::AuiManager->new($self);
 
     $self->{cwd} = Cwd::cwd();
 
@@ -34,15 +38,22 @@ sub new {
     Wx::Event::EVT_MENU($self, wxID_HELP_CONTENTS, \&onHelpContents);
     Wx::Event::EVT_MENU($self, wxID_ABOUT,         \&onHelpAbout);
 
+    $self->{notebook} = AMGui::Wx::Notebook->new($self);
+
+    # Set up the pane close event
+    #TODO#Wx::Event::EVT_AUI_PANE_CLOSE($self, sub { shift->on_aui_pane_close(@_); }, );
+
     return $self;
 }
 
 use Class::XSAccessor {
     getters => {
         notebook => 'notebook',
-        cwd      => 'cwd'
+        cwd      => 'cwd',
+        aui      => 'aui'
     },
 };
+
 
 ######################################################################
 # Menu event handlers
@@ -140,6 +151,16 @@ sub onHelpAbout {
     $event->Skip;
 }
 
+# TODO: see dialog in Padre::Main::close()
+#sub on_close_tab {
+#    my $self = shift;
+#    
+#    my $id = $self->notebook->GetSelection;
+#    $self->notebook->DeletePage($id);
+#    warn "Closing the tab ";
+#    return 1;
+#}
+
 ######################################################################
 
 =pod
@@ -208,6 +229,15 @@ sub setup_data_viewer {
 
     #my $dataFile = AMGui::DataFileTab->new($fileDlg, $self->{notebook});
 
+}
+
+######################################################################
+
+sub update_aui {
+    my $self = shift;
+    #return if $self->locked('refresh_aui');
+    $self->aui->Update;
+    return;    
 }
 
 ######################################################################
