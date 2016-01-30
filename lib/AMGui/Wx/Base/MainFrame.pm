@@ -37,31 +37,6 @@ sub new {
 
     $self = $self->SUPER::new( $parent, $id, $title, $pos, $size, $style, $name );
     
-
-    # Menu Bar
-
-    #$self->{mainFrame_menubar} = Wx::MenuBar->new();
-    #my $wxglade_tmp_menu;
-    #$wxglade_tmp_menu = Wx::Menu->new();
-    #$wxglade_tmp_menu->Append(wxID_NEW, _T("&New\tCtrl+N"), "");
-    #$wxglade_tmp_menu->Append(wxID_OPEN, _T("&Open\tCtrl+O"), "");
-    #$wxglade_tmp_menu->AppendSeparator();
-    #$wxglade_tmp_menu->Append(wxID_EXIT, _T("&Quit\tCtrl+Q"), "");
-    #$self->{mainFrame_menubar}->Append($wxglade_tmp_menu, _T("&File"));
-    #$wxglade_tmp_menu = Wx::Menu->new();
-    #$self->{mainFrame_menubar}->Append($wxglade_tmp_menu, _T("&Edit"));
-    #$wxglade_tmp_menu = Wx::Menu->new();
-    #$wxglade_tmp_menu->Append(1000, _T("&Run AM\tCtrl+R"), "");
-    #$self->{mainFrame_menubar}->Append($wxglade_tmp_menu, _T("&Run"));
-    #$wxglade_tmp_menu = Wx::Menu->new();
-    #$wxglade_tmp_menu->Append(wxID_HELP_CONTENTS, _T("Help\tCtrl+H"), "");
-    #$wxglade_tmp_menu->AppendSeparator();
-    #$wxglade_tmp_menu->Append(wxID_ABOUT, _T("About"), "");
-    #$self->{mainFrame_menubar}->Append($wxglade_tmp_menu, _T("&Help"));
-    #$self->SetMenuBar($self->{mainFrame_menubar});
-    
-    # Menu Bar end
-
     $self->{mainFrame_statusbar} = $self->CreateStatusBar(1);
     $self->{window_1} = Wx::SplitterWindow->new($self, wxID_ANY);
     $self->{grid_1} = Wx::Grid->new($self->{window_1}, wxID_ANY);
