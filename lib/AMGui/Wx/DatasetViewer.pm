@@ -1,10 +1,11 @@
 package AMGui::DatasetViewer;
-use base Wx::ListBox;
 
 use strict;
 use warnings;
 
 use Wx qw[:everything];
+
+our @ISA = 'Wx::ListBox';
 
 use Class::XSAccessor {
     getters => {
@@ -17,7 +18,7 @@ use Class::XSAccessor {
 };
 
 sub new {
-    my ( $class, $parent, $dataset ) = @_;
+    my ($class, $parent, $dataset ) = @_;
 
     my $self = $class->SUPER::new (
         $parent, 
@@ -27,7 +28,8 @@ sub new {
 	$dataset->items_as_strings,
 	wxLB_SINGLE
     );
-
+    bless $self, $class;
+    
     $self->{dataset} = $dataset;
     $self->{title} = $dataset->filename;
     
@@ -36,6 +38,13 @@ sub new {
     Wx::Event::EVT_LISTBOX_DCLICK($self, $self->GetId, \&on_double_click_item);
 
     return $self;
+}
+
+sub close {
+    my $self = shift;    
+    $self->dataset->close;
+    $self->classifier->close;
+    return 1;
 }
 
 # TODO: setting should trigger refreshing the view. which in turn requires asking the user
