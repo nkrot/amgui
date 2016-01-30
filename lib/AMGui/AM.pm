@@ -23,6 +23,14 @@ sub new {
     return $self;
 }
 
+sub close {
+    my $self = shift;
+    $self->{dataset} = undef;
+    $self->{classifier} = undef;
+    $self->{result} = undef;
+    return 1;
+}
+
 # Classify given test item using preset training set
 # 
 # >print @{ $self->result->winners }

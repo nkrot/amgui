@@ -6,6 +6,15 @@ use warnings;
 use Algorithm::AM::DataSet;
 use File::Spec;
 
+use Class::XSAccessor {
+    getters => {
+        data     => 'data',      # instance of AM::DataSet
+        path     => 'path',      # full/path/to/filename
+        format   => 'format',    # data formats available in AM::DataSet
+        filename => 'filename',  # last portion of the path: filename
+    },
+};
+
 #
 # TODO for AM::DataSet ?
 # is it possible to refactor AM::DataSet->new() so that it becomes possible to use it
@@ -16,7 +25,7 @@ use File::Spec;
 #
 
 sub new {
-    my ( $class, %args ) = @_;
+    my ($class, %args) = @_;
 
     my $self = bless {}, $class;
 
@@ -33,16 +42,11 @@ sub new {
 
 ######################################################################
 
-use Class::XSAccessor {
-    getters => {
-        data     => 'data',      # instance of AM::DataSet
-        path     => 'path',      # full/path/to/filename
-        format   => 'format',    # data formats available in AM::DataSet
-        filename => 'filename',  # last portion of the path: filename
-    },
-};
-
-######################################################################
+sub close {
+    my $self = shift;
+    $self->{data} = undef;
+    return 1;
+}
 
 sub size {
     my $self = shift;
