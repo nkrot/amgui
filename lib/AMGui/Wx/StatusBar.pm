@@ -29,8 +29,6 @@ sub new {
     
     $self->say("Status bar or cafe");
     
-    warn $self;
-    
     return $self;
 }
 
