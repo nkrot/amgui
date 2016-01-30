@@ -29,19 +29,21 @@ sub new {
 
     $self->{cwd} = Cwd::cwd();
 
-    $self->{menu} = AMGui::Wx::Menubar->new($self);
-    #$self->SetMenuBar($self->{menu}->wx); #TODO: what is it?
-    $self->SetMenuBar($self->{menu});
+    $self->{menubar} = AMGui::Wx::Menubar->new($self);
+    $self->SetMenuBar($self->{menubar}->menubar);
 
     # Have to rebind the handlers here
-    Wx::Event::EVT_MENU($self, wxID_NEW,           \&onFileNew);
-    Wx::Event::EVT_MENU($self, wxID_OPEN,          \&onFileOpen);
-    Wx::Event::EVT_MENU($self, wxID_EXIT,          \&onFileQuit);
+    Wx::Event::EVT_MENU($self, wxID_NEW,           \&on_file_new);
+    Wx::Event::EVT_MENU($self, wxID_OPEN,          \&on_file_open);
+    Wx::Event::EVT_MENU($self, wxID_EXIT,          \&on_file_quit);
 
-    Wx::Event::EVT_MENU($self, wxID_RUN,           \&onRun);
+    Wx::Event::EVT_MENU($self, wxID_RUN,           \&on_run);
     
-    Wx::Event::EVT_MENU($self, wxID_HELP_CONTENTS, \&onHelpContents);
-    Wx::Event::EVT_MENU($self, wxID_ABOUT,         \&onHelpAbout);
+    Wx::Event::EVT_MENU($self, wxID_NEXT_TAB,      \&on_next_tab);
+    Wx::Event::EVT_MENU($self, wxID_PREV_TAB,      \&on_previous_tab);
+    
+    Wx::Event::EVT_MENU($self, wxID_HELP_CONTENTS, \&on_help_contents);
+    Wx::Event::EVT_MENU($self, wxID_ABOUT,         \&on_help_about);
 
     $self->{notebook} = AMGui::Wx::Notebook->new($self);
 
@@ -63,13 +65,13 @@ use Class::XSAccessor {
 ######################################################################
 # Menu event handlers
 
-sub onFileNew {
+sub on_file_new {
     my ($self, $event) = @_;
     warn "Event handler (onFileNew) not implemented";
     $event->Skip;
 }
 
-sub onFileOpen {
+sub on_file_open {
     my ($self, $event) = @_;
     
     my $wildcards = join(
@@ -124,12 +126,12 @@ sub onFileOpen {
     return 1;
 }
 
-sub onFileQuit {
+sub on_file_quit {
     my ($self, $event) = @_;
     $self->Close(1);
 }
 
-sub onRun {
+sub on_run {
     my ($self, $event) = @_;
     
     # TODO
@@ -138,21 +140,33 @@ sub onRun {
     #    and report the random item somewhere
     #if ($self->{lbFileData})
     
-    $self->inform("I am running");
+    $self->inform("I am running :)");
 
     return 1;
 }
 
-sub onHelpContents {
+sub on_next_tab {
     my ($self, $event) = @_;
-    warn "Event handler (onHelpContents) not implemented";
+    $self->notebook->select_next_tab;
+    return 1;
+}
+
+sub on_previous_tab {
+    my ($self, $event) = @_;
+    $self->notebook->select_previous_tab;
+    return 1;  
+}
+
+sub on_help_contents {
+    my ($self, $event) = @_;
+    $self->inform("Help::Contents not yet implemented");
     $event->Skip;
 }
 
 
-sub onHelpAbout {
+sub on_help_about {
     my ($self, $event) = @_;
-    warn "Event handler (onHelpAbout) not implemented";
+    $self->inform("Help::About implemented yet");
     $event->Skip;
 }
 
