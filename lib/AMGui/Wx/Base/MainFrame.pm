@@ -37,10 +37,8 @@ sub new {
 
     $self = $self->SUPER::new( $parent, $id, $title, $pos, $size, $style, $name );
     
-    $self->{mainFrame_statusbar} = $self->CreateStatusBar(1);
     $self->{window_1} = Wx::SplitterWindow->new($self, wxID_ANY);
     $self->{grid_1} = Wx::Grid->new($self->{window_1}, wxID_ANY);
-    #$self->{notebook} = AMGui::Wx::Notebook->new($self->{window_1}, wxID_ANY);
 
     $self->__set_properties();
     $self->__do_layout();
@@ -56,17 +54,7 @@ sub __set_properties {
     # begin wxGlade: AMGui::Wx::Base::MainFrame::__set_properties
     $self->SetTitle(_T("Main Frame"));
     $self->SetSize(Wx::Size->new(900, 525));
-    $self->{mainFrame_statusbar}->SetStatusWidths(-1);
 
-    # statusbar fields
-    my( @mainFrame_statusbar_fields ) = (
-        _T("Status Bar"),
-    );
-
-    if( @mainFrame_statusbar_fields ) {
-        $self->{mainFrame_statusbar}->SetStatusText($mainFrame_statusbar_fields[$_], $_)
-        for 0 .. $#mainFrame_statusbar_fields ;
-    }
     $self->{grid_1}->CreateGrid(10, 3);
     $self->{grid_1}->SetSelectionMode(wxGridSelectCells);
     # end wxGlade
