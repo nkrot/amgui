@@ -1,8 +1,5 @@
 package AMGui::Wx::Main;
-use base qw(AMGui::Wx::Base::MainFrame);
 
-use Wx qw[:everything];
-use Wx::Locale gettext => '_T';
 use strict;
 use warnings;
 
@@ -10,22 +7,53 @@ use Cwd ();
 use File::Slurp;
 use File::Spec;
 
+use Wx qw[:everything];
+use Wx::Locale gettext => '_T';
+
 use AMGui::AM;
 use AMGui::Constant;
 use AMGui::DataSet;
+
 use AMGui::Wx::AuiManager;
+use AMGui::Wx::DatasetViewer;
 use AMGui::Wx::Menubar;
 use AMGui::Wx::Notebook;
 use AMGui::Wx::StatusBar;
-use AMGui::Wx::DatasetViewer;
 
-#our @ISA        = qw{};
+our @ISA = 'Wx::Frame';
+
+use Class::XSAccessor {
+    getters => {
+        notebook  => 'notebook',
+        menubar   => 'menubar',
+        statusbar => 'statusbar',
+        cwd       => 'cwd',
+        aui       => 'aui'
+    },
+};
 
 sub new {
-    my( $self, $parent, $id, $title, $pos, $size, $style, $name ) = @_;
-    $self = $self->SUPER::new( $parent, $id, $title, $pos, $size, $style, $name );
-    $self->SetTitle("AM Gui");
+    my ($class, $parent, $id, $title, $pos, $size, $style, $name) = @_;
+    $parent = undef              unless defined $parent;
+    $id     = -1                 unless defined $id;
+    $title  = ""                 unless defined $title;
+    $pos    = wxDefaultPosition  unless defined $pos;
+    $size   = wxDefaultSize      unless defined $size;
+    $name   = ""                 unless defined $name;
+    $style  = wxDEFAULT_FRAME_STYLE 
+        unless defined $style;
 
+    my $self = $class->SUPER::new($parent, $id, $title, $pos, $size, $style, $name);
+
+    #$self->{window_1} = Wx::SplitterWindow->new($self, wxID_ANY);
+    #$self->{grid_1} = Wx::Grid->new($self->{window_1}, wxID_ANY);
+
+    $self->SetTitle(_T("AM Gui"));
+    $self->SetSize(Wx::Size->new(900, 700));
+    
+    #$self->{grid_1}->CreateGrid(10, 3);
+    #$self->{grid_1}->SetSelectionMode(wxGridSelectCells);
+   
     $self->{aui} = AMGui::Wx::AuiManager->new($self);
 
     $self->{cwd} = Cwd::cwd();
@@ -36,21 +64,17 @@ sub new {
     $self->{statusbar} = AMGui::Wx::StatusBar->new($self);
     $self->SetStatusBar($self->{statusbar});
 
-    # Have to rebind the handlers here
+    $self->{notebook} = AMGui::Wx::Notebook->new($self);
+
     Wx::Event::EVT_MENU($self, wxID_NEW,           \&on_file_new);
     Wx::Event::EVT_MENU($self, wxID_OPEN,          \&on_file_open);
     Wx::Event::EVT_MENU($self, wxID_CLOSE,         \&on_file_close);
     Wx::Event::EVT_MENU($self, wxID_EXIT,          \&on_file_quit);
-
     Wx::Event::EVT_MENU($self, wxID_RUN,           \&on_run);
-
     Wx::Event::EVT_MENU($self, wxID_NEXT_TAB,      \&on_next_tab);
     Wx::Event::EVT_MENU($self, wxID_PREV_TAB,      \&on_previous_tab);
-
     Wx::Event::EVT_MENU($self, wxID_HELP_CONTENTS, \&on_help_contents);
     Wx::Event::EVT_MENU($self, wxID_ABOUT,         \&on_help_about);
-
-    $self->{notebook} = AMGui::Wx::Notebook->new($self);
 
     # Set up the pane close event
     #TODO#Wx::Event::EVT_AUI_PANE_CLOSE($self, sub { shift->on_aui_pane_close(@_); }, );
@@ -58,14 +82,25 @@ sub new {
     return $self;
 }
 
-use Class::XSAccessor {
-    getters => {
-        notebook => 'notebook',
-        cwd      => 'cwd',
-        aui      => 'aui'
-    },
-};
+# old wxGlade code
+#sub __set_properties {
+#    my $self = shift;
+#    $self->SetTitle(_T("Main Frame"));
+#    $self->SetSize(Wx::Size->new(900, 525));
+#
+#    $self->{grid_1}->CreateGrid(10, 3);
+#    $self->{grid_1}->SetSelectionMode(wxGridSelectCells);
+#}
 
+# old wxGlade code
+#sub __do_layout {
+#    my $self = shift;
+#    $self->{sizer_1} = Wx::BoxSizer->new(wxHORIZONTAL);
+#    #$self->{window_1}->SplitVertically($self->{grid_1}, $self->{notebook}, );
+#    $self->{sizer_1}->Add($self->{window_1}, 1, wxEXPAND, 0);
+#    $self->SetSizer($self->{sizer_1});
+#    $self->Layout();
+#}
 
 ######################################################################
 # Menu event handlers
@@ -188,16 +223,6 @@ sub on_help_about {
     $self->inform("Help::About implemented yet");
     $event->Skip;
 }
-
-# TODO: see dialog in Padre::Main::close()
-#sub on_close_tab {
-#    my $self = shift;
-#    
-#    my $id = $self->notebook->GetSelection;
-#    $self->notebook->DeletePage($id);
-#    warn "Closing the tab ";
-#    return 1;
-#}
 
 ######################################################################
 
