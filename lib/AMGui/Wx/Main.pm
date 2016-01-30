@@ -1,4 +1,4 @@
-package AMGui::Wx::MainFrame;
+package AMGui::Wx::Main;
 use base qw(AMGui::Wx::Base::MainFrame);
 
 use Wx qw[:everything];
@@ -35,13 +35,14 @@ sub new {
     # Have to rebind the handlers here
     Wx::Event::EVT_MENU($self, wxID_NEW,           \&on_file_new);
     Wx::Event::EVT_MENU($self, wxID_OPEN,          \&on_file_open);
+    Wx::Event::EVT_MENU($self, wxID_CLOSE,         \&on_file_close);
     Wx::Event::EVT_MENU($self, wxID_EXIT,          \&on_file_quit);
 
     Wx::Event::EVT_MENU($self, wxID_RUN,           \&on_run);
-    
+
     Wx::Event::EVT_MENU($self, wxID_NEXT_TAB,      \&on_next_tab);
     Wx::Event::EVT_MENU($self, wxID_PREV_TAB,      \&on_previous_tab);
-    
+
     Wx::Event::EVT_MENU($self, wxID_HELP_CONTENTS, \&on_help_contents);
     Wx::Event::EVT_MENU($self, wxID_ABOUT,         \&on_help_about);
 
@@ -122,6 +123,20 @@ sub on_file_open {
         
 	$self->setup_data_viewers(@files) if $#files > -1;
     }
+    
+    return 1;
+}
+
+# TODO: check if has unsaved modifications and do something about it
+sub on_file_close {
+    my ($self, $event) = @_;
+
+    my $nb = $self->notebook;
+    my $id = $nb->GetSelection;
+    my $obj = $nb->GetPage($id);
+
+    $obj->close  if $obj->can('close');
+    $nb->DeletePage($id);
     
     return 1;
 }
