@@ -16,6 +16,7 @@ use AMGui::DataSet;
 use AMGui::Wx::AuiManager;
 use AMGui::Wx::Menubar;
 use AMGui::Wx::Notebook;
+use AMGui::Wx::StatusBar;
 use AMGui::Wx::DatasetViewer;
 
 #our @ISA        = qw{};
@@ -31,6 +32,9 @@ sub new {
 
     $self->{menubar} = AMGui::Wx::Menubar->new($self);
     $self->SetMenuBar($self->{menubar}->menubar);
+    
+    $self->{statusbar} = AMGui::Wx::StatusBar->new($self);
+    $self->SetStatusBar($self->{statusbar});
 
     # Have to rebind the handlers here
     Wx::Event::EVT_MENU($self, wxID_NEW,           \&on_file_new);
