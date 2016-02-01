@@ -1,4 +1,4 @@
-package AMGui::DatasetViewer;
+package AMGui::Wx::DatasetViewer;
 
 use strict;
 use warnings;
@@ -23,10 +23,10 @@ sub new {
     my $self = $class->SUPER::new (
         $parent, 
         wxID_ANY, 
-	wxDefaultPosition, 
-	wxDefaultSize, 
-	$dataset->items_as_strings,
-	wxLB_SINGLE
+        wxDefaultPosition, 
+        wxDefaultSize, 
+        $dataset->items_as_strings,
+        wxLB_SINGLE
     );
     bless $self, $class;
     
@@ -68,13 +68,6 @@ sub on_double_click_item {
     
     $self->classifier->set_dataset($self->dataset->data); # AMGui::DataSet->AM::DataSet
     $self->classifier->classify($item);
-    
-    # yess!
-    # TODO: how to render the result in another GUI component?
-    #warn $item;
-    #warn @{ $self->classifier->result->winners };
-    #warn ${ $self->classifier->result->statistical_summary };
 }
-
 
 1;

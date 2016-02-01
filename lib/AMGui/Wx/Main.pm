@@ -16,6 +16,7 @@ use AMGui::DataSet;
 
 use AMGui::Wx::AuiManager;
 use AMGui::Wx::DatasetViewer;
+use AMGui::Wx::ResultViewer;
 use AMGui::Wx::Menubar;
 use AMGui::Wx::Notebook;
 use AMGui::Wx::StatusBar;
@@ -278,20 +279,12 @@ sub setup_data_viewer {
     my $classifier = AMGui::AM->new;
     
     # GUI component for showing exemplars and running the classifier
-    my $data_viewer = AMGui::DatasetViewer->new($self->notebook, $dataset);
-    #$data_dataset->set_dataset($dataset);
-    $data_viewer->set_classifier($classifier);
-    
-    #$dataset->set_viewer($data_viewer); # ???
+    my $dataset_viewer = AMGui::Wx::DatasetViewer->new($self->notebook, $dataset);
+    $dataset_viewer->set_classifier($classifier);
 
-    # my old code
-    # TODO: how Padre stores and accesses tabs?
-    # TODO: store $dataFile (listBox) somewhere.
-    #  $self->{lbFileData} = $dataFile
-    # in onRun, need to access 1) selected line 2) all lines
-
-    #my $dataFile = AMGui::DataFileTab->new($fileDlg, $self->{notebook});
-
+    # GUI component for showing classification results
+    my $result_viewer = AMGui::Wx::ResultViewer->new($self->notebook);
+    $result_viewer->set_classifier($classifier);
 }
 
 ######################################################################
