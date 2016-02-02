@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Algorithm::AM;
-use AMGui::Result;
+use AMGui::Results;
  
 use Class::XSAccessor {
     getters => {
