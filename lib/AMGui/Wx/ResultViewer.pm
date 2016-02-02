@@ -4,13 +4,13 @@ use strict;
 use warnings;
 
 use AMGui::Constant;
-use AMGui::Result;
+use AMGui::Results;
 
 our @ISA = 'Wx::ListBox';
 
 use Class::XSAccessor {
     getters => {
-        result   => 'result', # AMGui::Result (collection)
+        results  => 'results', # AMGui::Result (collection)
         notebook => 'notebook',
         index    => 'index'
     }
@@ -31,7 +31,7 @@ sub new {
 
     $self->Hide;
 
-    $self->{result} = AMGui::Result->new;
+    $self->{results} = AMGui::Results->new;
     $self->{title} = "Result";
 
     $self->{notebook} = $parent;
@@ -59,12 +59,18 @@ sub show {
 
 sub add {
     my ($self, $result) = @_;
-    $self->result->add( $result );
+    $self->results->add( $result );
 
-    $self->show(TRUE); # and switch to the tab
+    $self->show(TRUE); # and switch to this very tab
     
-    # TODO: add lines
-    $self->InsertItems( ["Hello"], 0 );
+    my $count = $self->GetCount;
+
+    my $items = $self->results->as_strings( $result );
+    $self->InsertItems( $items, $count );
+    
+    # focus the most recent result
+    $self->SetSelection($count); # highlight the first line of the added result
+    $self->SetFirstItem($count); # scrolls to the item
 
     return $self;
 }
