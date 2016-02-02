@@ -10,7 +10,9 @@ our @ISA = 'Wx::ListBox';
 
 use Class::XSAccessor {
     getters => {
-        result => 'result', # AMGui::Result (collection)
+        result   => 'result', # AMGui::Result (collection)
+        notebook => 'notebook',
+        index    => 'index'
     }
 };
 
@@ -32,31 +34,44 @@ sub new {
     $self->{result} = AMGui::Result->new;
     $self->{title} = "Result";
 
-    $self->{parent} = $parent;
+    $self->{notebook} = $parent;
     $self->{visible} = FALSE;
 
     return $self;
 }
 
 sub show {
-    my $self = shift;
+    my ($self, $select) = @_;
+    $select = FALSE  unless defined $select;
+    
     unless ( $self->{visible} ) {
-        $self->{parent}->AddPage($self, $self->{title}, TRUE);
+        $self->{index} = $self->notebook->GetPageCount();
+        $self->{notebook}->AddPage($self, $self->{title}, TRUE);
         $self->{visible} = TRUE;
     }
+    
+    if ( $select ) {
+        $self->select;
+    }
+    
+    return $self;
 }
 
 sub add {
     my ($self, $result) = @_;
     $self->result->add( $result );
 
-    $self->show;
+    $self->show(TRUE); # and switch to the tab
     
     # TODO: add lines
-    # TODO: switch to the tab with results
-    # TODO: set focus to the last result
     $self->InsertItems( ["Hello"], 0 );
 
+    return $self;
+}
+
+sub select {
+    my $self = shift;
+    $self->notebook->SetSelection($self->index);
     return $self;
 }
 
