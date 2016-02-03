@@ -69,6 +69,7 @@ sub new {
 
     Wx::Event::EVT_MENU($self, wxID_NEW,           \&on_file_new);
     Wx::Event::EVT_MENU($self, wxID_OPEN,          \&on_file_open);
+    Wx::Event::EVT_MENU($self, wxID_OPEN_PROJECT,  \&on_file_open_project);
     Wx::Event::EVT_MENU($self, wxID_CLOSE,         \&on_file_close);
     Wx::Event::EVT_MENU($self, wxID_EXIT,          \&on_file_quit);
     Wx::Event::EVT_MENU($self, wxID_RUN,           \&on_run);
@@ -115,24 +116,20 @@ sub on_file_new {
 sub on_file_open {
     my ($self, $event) = @_;
     
-    my $wildcards = join(
+    my $wildcard = join(
         '|',
- 	_T('CSV Files'),  '*.csv;*.CSV',
- 	_T('Text Files'), '*.txt;*.TXT'
+        _T('All Files'),  ( AMGui::Constant::WIN32 ? '*.*' : '*' ),
+        _T('CSV Files'),  '*.csv;*.CSV',
+        _T('Text Files'), '*.txt;*.TXT'
     );
-    
-    $wildcards =
-        AMGui::Constant::WIN32
-        ? _T('All Files') . '|*.*|' . $wildcards
-        : _T('All Files') . '|*|' . $wildcards;
     
     my $fileDlg = Wx::FileDialog->new( 
         $self,
         _T('Open Files'),
         $self->cwd,    # Default directory
         '',            # Default file
-        $wildcards,
-        wxOPEN|wxFILE_MUST_EXIST|wxFD_MULTIPLE
+        $wildcard,
+        wxOPEN|wxFILE_MUST_EXIST
     );
 
     # If the user really selected a file
@@ -155,17 +152,85 @@ sub on_file_open {
                     $self,
                 );
 
-		next if $ret == Wx::wxYES;
+                next if $ret == Wx::wxYES;
             }
 
             push @files, $fname
         }
         
-	$self->setup_data_viewers(@files) if $#files > -1;
+        $self->setup_data_viewers(@files) if $#files > -1;
     }
     
     return 1;
 }
+
+# open 'data' and 'test' files
+sub on_file_open_project {
+    my ($self, $event) = @_;
+
+    my $wildcard = join(
+        '|',
+        _T('Project Files'), 'data;Data;DATA;test;Test;TEST',
+        _T('All Files'),     ( AMGui::Constant::WIN32 ? '*.*' : '*' )
+     );
+
+    my $file_dlg = Wx::FileDialog->new( 
+        $self,
+        _T('Open Training and Testing datasets at once'),
+        $self->cwd,    # Default directory
+        '',            # Default file
+        $wildcard,
+        wxOPEN|wxFILE_MUST_EXIST|wxFD_MULTIPLE
+    );
+
+    # If the user really selected a file
+    if ($file_dlg->ShowModal == wxID_OK)
+    {
+        my @filenames = $file_dlg->GetFilenames;
+        $self->{cwd} = $file_dlg->GetDirectory;
+
+        # TODO: check that there are exactly two files
+        # and swear otherwise
+        
+        my (@files, @file_types);
+        foreach my $filename (@filenames) {
+            # Construct full paths, correctly for each platform
+            my $fname = File::Spec->catfile($self->cwd, $filename);
+
+            unless ( -e $fname ) {
+                my $ret = Wx::MessageBox(
+                    sprintf(_T('File name %s does not exist on disk. Skip it?'), $fname),
+                    _T("Open File Warning"),
+                    Wx::wxYES_NO|Wx::wxCENTRE,
+                    $self,
+                );
+
+                next if $ret == Wx::wxYES;
+            }
+
+            push @files, $fname;
+            
+            if ( lc $filename eq 'data' ) {
+                push @file_types, 'train';
+            } elsif (lc $filename eq 'test') {
+                push @file_types, 'test';
+            } else {
+                #TODO: react meaningfully
+            }
+
+        }
+        
+        warn "Selected files: " . join(", ", @files);
+        warn "Selected file types: " . join(", ", @file_types);
+
+        # TODO: once again check if there are two files.
+        #$self->setup_data_viewers(@files, @file_types) if $#files > -1;
+    }
+
+    #$event->Skip;
+    return 1;
+}
+
 
 # TODO: check if has unsaved modifications and do something about it
 sub on_file_close {
@@ -238,8 +303,9 @@ Setup (new) tabs for C<@files>, and update the GUI.
 =cut
 
 sub setup_data_viewers {
-    my $self  = shift;
-    my @files = @_;
+    my ($self, @files, @file_types) = @_;
+    warn "FILES:" . @files;
+    warn "FILE TYPES:" . @file_types;
 
     if (@files) {
         foreach my $file (@files) {
