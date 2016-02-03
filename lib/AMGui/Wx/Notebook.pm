@@ -41,18 +41,21 @@ sub new {
     
     my @help = (
         "== USAGE ==",
-        "Open a file in 'commas' format. File/Open or Ctrl-O",
-        "Once it is loaded, double click an item"
+        "1. Open a file in 'commas' format. File/Open or Ctrl-O",
+        "Once it is loaded, double click an item. It will be classified and results will appear in another tab",
+        "2. TODO: Open a project (data and test files) at once.",
+        "TODO: Then press Run or Ctrl+R to run the classification on all items in test set"
     );
 
     my $self = $class->SUPER::new(
-	$main,
-	-1,
-	Wx::wxDefaultPosition,
-	Wx::wxDefaultSize,
-	Wx::wxAUI_NB_TOP | Wx::wxBORDER_NONE | Wx::wxAUI_NB_SCROLL_BUTTONS | Wx::wxAUI_NB_TAB_MOVE
-		| Wx::wxAUI_NB_CLOSE_ON_ACTIVE_TAB | Wx::wxAUI_NB_WINDOWLIST_BUTTON
+        $main,
+        -1,
+        Wx::wxDefaultPosition,
+        Wx::wxDefaultSize,
+        Wx::wxAUI_NB_TOP | Wx::wxBORDER_NONE | Wx::wxAUI_NB_SCROLL_BUTTONS | Wx::wxAUI_NB_TAB_MOVE
+            | Wx::wxAUI_NB_CLOSE_ON_ACTIVE_TAB | Wx::wxAUI_NB_WINDOWLIST_BUTTON
     );
+    
     $self->{main} = $main;
     
     $aui->AddPane(
