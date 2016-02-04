@@ -66,7 +66,9 @@ sub on_double_click_item {
     my $item_idx = $self->GetSelection();
     my $item = $self->dataset->nth_item($item_idx);
     
-    $self->classifier->set_dataset($self->dataset->data); # AMGui::DataSet->AM::DataSet
+    my $training = $self->dataset->training->data;
+
+    $self->classifier->set_dataset($training); # AMGui::DataSet->AM::DataSet
     $self->classifier->classify($item);
 }
 
