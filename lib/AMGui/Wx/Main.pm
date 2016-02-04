@@ -158,7 +158,7 @@ sub on_file_open {
             push @files, $fname
         }
         
-        $self->setup_data_viewers(@files) if $#files > -1;
+        $self->setup_data_viewers(\@files) if scalar(@files) > 0;
     }
     
     return 1;
@@ -192,7 +192,7 @@ sub on_file_open_project {
         # TODO: check that there are exactly two files
         # and swear otherwise
         
-        my (@files, @file_types);
+        my (@files, @data_types);
         foreach my $filename (@filenames) {
             # Construct full paths, correctly for each platform
             my $fname = File::Spec->catfile($self->cwd, $filename);
@@ -211,20 +211,21 @@ sub on_file_open_project {
             push @files, $fname;
             
             if ( lc $filename eq 'data' ) {
-                push @file_types, 'train';
+                push @data_types, AMGui::DataSet::TRAINING;
             } elsif (lc $filename eq 'test') {
-                push @file_types, 'test';
+                push @data_types, AMGui::DataSet::TESTING;
             } else {
                 #TODO: react meaningfully
             }
-
         }
         
-        warn "Selected files: " . join(", ", @files);
-        warn "Selected file types: " . join(", ", @file_types);
-
-        # TODO: once again check if there are two files.
-        #$self->setup_data_viewers(@files, @file_types) if $#files > -1;
+        if ( scalar(@files) == 2 ) {
+            $self->setup_data_viewers(\@files, \@data_types);
+        } else {
+            #TODO: throw a warning: invalid number of files
+            # TODO: in theory, 2+ files can be opened, it is importants that there are
+            # at least one 'train' and at least one 'test' file.
+        }
     }
 
     #$event->Skip;
@@ -296,33 +297,45 @@ sub on_help_about {
 
 =head3 C<setup_data_viewers>
 
-    $main->setup_data_viewers( @files );
+    $main->setup_data_viewers( \@files [, \@dataset_types] );
 
 Setup (new) tabs for C<@files>, and update the GUI.
 
 =cut
 
 sub setup_data_viewers {
-    my ($self, @files, @file_types) = @_;
-    warn "FILES:" . @files;
-    warn "FILE TYPES:" . @file_types;
+    my ($self, $files, $dataset_types) = @_;
+    $#$dataset_types = $#$files  unless defined $dataset_types;
 
-    if (@files) {
-        foreach my $file (@files) {
-            $self->setup_data_viewer($file);
-        }
-    } else {
-        # TODO: open an empty document? for what?
+    my @data_viewers = ();
+    my $training;
+
+    for (my $idx=0; $idx <= $#$files; $idx++) {
+        my $dv = $self->setup_data_viewer($files->[$idx], $dataset_types->[$idx]);
+        push @data_viewers, $dv;
+        $training = $dv->dataset  if $dv->dataset->is_training;
     }
+    
+    # each test dataset must be linked to corresponding training dataset
+    if ( $training ) {
+        foreach my $dv (@data_viewers) {
+            if ( $dv->dataset->is_testing ) {
+                $dv->dataset->set_training($training);
+            }
+        }
+    }
+    
+    return scalar @data_viewers;
 }
 
 =pod
 
 =head3 C<setup_data_viewer>
 
-    $main->setup_data_viewer( $file );
+    $main->setup_data_viewer( $file, $dataset_purpose );
 
 Setup a new tab / buffer and open C<$file>, then update the GUI.
+dataset_purpose is either 'training' or 'testing'
 
 =cut
 
@@ -332,7 +345,7 @@ Setup a new tab / buffer and open C<$file>, then update the GUI.
 #Finally, if C<$file> does not exist, create an empty file before opening it.
 
 sub setup_data_viewer {
-    my ($self, $file) = @_;
+    my ($self, $file, $dataset_purpose) = @_;
     
     # load exemplars from file
     my %args = (
@@ -340,6 +353,7 @@ sub setup_data_viewer {
         format => 'commas'  # TODO: set it from GUI control or from file extension?
     );
     my $dataset = AMGui::DataSet->new(%args);
+    $dataset->set_purpose($dataset_purpose) if defined $dataset_purpose;
     
     # an instance of AM classifier
     my $classifier = AMGui::AM->new;
@@ -351,6 +365,8 @@ sub setup_data_viewer {
     # GUI component for showing classification results
     my $result_viewer = AMGui::Wx::ResultViewer->new($self->notebook);
     $result_viewer->set_classifier($classifier);
+    
+    return $dataset_viewer;
 }
 
 ######################################################################
