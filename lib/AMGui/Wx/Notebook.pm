@@ -43,8 +43,10 @@ sub new {
         "== USAGE ==",
         "1. Open a file in 'commas' format. File/Open or Ctrl-O",
         "Once it is loaded, double click an item. It will be classified and results will appear in another tab",
-        "2. TODO: Open a project (data and test files) at once.",
-        "TODO: Then press Run or Ctrl+R to run the classification on all items in test set"
+        "2. Open a project ('data' and 'test' files with training and testing datasets respectively) at once.",
+        "The testing dataset gets associated with the training dataset so that double clicking an item in testing",
+        "automatically uses associated training dataset.",
+        "3. TODO: Pressing Run or Ctrl+R classifies all items in the current dataset against associated training dataset"
     );
 
     my $self = $class->SUPER::new(
