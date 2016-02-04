@@ -12,17 +12,17 @@ use Class::XSAccessor {
         path     => 'path',      # full/path/to/filename
         format   => 'format',    # data formats available in AM::DataSet
         filename => 'filename',  # last portion of the path: filename
+        purpose  => 'purpose',
+        training => 'training'   # associated training dataset
     },
+    setters => {
+        'set_purpose'  => 'purpose',
+        'set_training' => 'training'
+    }
 };
 
-#
-# TODO for AM::DataSet ?
-# is it possible to refactor AM::DataSet->new() so that it becomes possible to use it
-# like this:
-#   my $dataset = Algorithm::AM::DataSet->new(path => ..., format => ...);
-# in which case data should be loaded automatically
-# In this case this very AMGui::DataSet class could be derived from AM::DataSet
-#
+use constant TRAINING => 'training';
+use constant TESTING  => 'testing';
 
 sub new {
     my ($class, %args) = @_;
@@ -34,10 +34,24 @@ sub new {
         $self->{$key} = $value;
     }
     
-    $self->{data} = Algorithm::AM::DataSet::dataset_from_file(%args);
+    $self->{data}     = Algorithm::AM::DataSet::dataset_from_file(%args);
     $self->{filename} = ( File::Spec->splitpath( $self->path ) )[-1];
+    $self->{purpose}  = undef ; # TRAINING or TESTING
+    $self->{training} = $self;
      
     return $self;
+}
+
+sub is_training {
+    my $self = shift;
+    return 0  unless defined $self->purpose;
+    return $self->purpose eq TRAINING;
+}
+
+sub is_testing {
+    my $self = shift;
+    return 0  unless defined $self->purpose;
+    return $self->purpose eq TESTING;
 }
 
 ######################################################################
