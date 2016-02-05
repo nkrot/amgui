@@ -72,7 +72,7 @@ sub new {
     Wx::Event::EVT_MENU($self, wxID_OPEN_PROJECT,  \&on_file_open_project);
     Wx::Event::EVT_MENU($self, wxID_CLOSE,         \&on_file_close);
     Wx::Event::EVT_MENU($self, wxID_EXIT,          \&on_file_quit);
-    Wx::Event::EVT_MENU($self, wxID_RUN,           \&on_run);
+    Wx::Event::EVT_MENU($self, wxID_RUN_BATCH,     \&on_run_batch);
     Wx::Event::EVT_MENU($self, wxID_NEXT_TAB,      \&on_next_tab);
     Wx::Event::EVT_MENU($self, wxID_PREV_TAB,      \&on_previous_tab);
     Wx::Event::EVT_MENU($self, wxID_HELP_CONTENTS, \&on_help_contents);
@@ -252,7 +252,7 @@ sub on_file_quit {
     $self->Close(1);
 }
 
-sub on_run {
+sub on_run_batch {
     my ($self, $event) = @_;
     
     # TODO
@@ -261,7 +261,7 @@ sub on_run {
     #    and report the random item somewhere
     #if ($self->{lbFileData})
     
-    $self->inform("I am running :)");
+    $self->inform("I am running in batch mode:)");
 
     return 1;
 }

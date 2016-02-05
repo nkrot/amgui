@@ -16,7 +16,7 @@ sub new {
     my $self = $class->SUPER::new(@_);
     bless $self, $class;
 
-    $self->Append(wxID_RUN,  _T("&Run AM\tCtrl+R"), "");
+    $self->Append(wxID_RUN_BATCH,  _T("&Run AM over the current file\tCtrl+R"), "");
 
     return $self;
 }
