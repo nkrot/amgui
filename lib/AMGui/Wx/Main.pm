@@ -236,15 +236,7 @@ sub on_file_open_project {
 # TODO: check if has unsaved modifications and do something about it
 sub on_file_close {
     my ($self, $event) = @_;
-
-    my $nb = $self->notebook;
-    my $id = $nb->GetSelection;
-    my $obj = $nb->GetPage($id);
-
-    $obj->close  if $obj->can('close');
-    $nb->DeletePage($id);
-    
-    return 1;
+    return $self->notebook->close_current_page;
 }
 
 sub on_file_quit {
