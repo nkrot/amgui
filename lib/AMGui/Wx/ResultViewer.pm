@@ -83,13 +83,16 @@ sub add {
     # focus the most recent result
     $self->SetSelection($count); # highlight the first line of the added result
     $self->SetFirstItem($count); # scrolls to the item
+    
+    #$self->main->update_aui;
+    #$self->notebook->Update;
 
     return $self;
 }
 
 sub select {
     my $self = shift;
-    $self->notebook->SetSelection($self->index);
+    $self->notebook->SetSelection( $self->index );
     return $self;
 }
 
