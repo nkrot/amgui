@@ -10,6 +10,7 @@ our @ISA = 'Wx::ListBox';
 
 use Class::XSAccessor {
     getters => {
+        main     => 'main',
         results  => 'results', # AMGui::Result (collection)
         notebook => 'notebook',
         index    => 'index'
@@ -17,7 +18,7 @@ use Class::XSAccessor {
 };
 
 sub new {
-    my ($class, $parent) = @_;
+    my ($class, $parent, $main) = @_;
     
     my $self = $class->SUPER::new (
         $parent, 
@@ -31,11 +32,15 @@ sub new {
 
     $self->Hide;
 
+    $self->{main} = defined $main ? $main : $parent->main;
+    
     $self->{results} = AMGui::Results->new;
     $self->{title} = "Result";
 
     $self->{notebook} = $parent;
     $self->{visible} = FALSE;
+    
+    $self->{statusbar_message} = '';
 
     return $self;
 }
@@ -54,6 +59,13 @@ sub show {
         $self->select;
     }
     
+    return $self;
+}
+
+sub show_in_statusbar {
+    my ($self, $msg) = @_;
+    $self->{statusbar_message} = $msg;
+    $self->main->statusbar->say($msg);
     return $self;
 }
 
