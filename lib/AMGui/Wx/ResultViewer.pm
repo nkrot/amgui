@@ -69,6 +69,9 @@ sub show_in_statusbar {
     return $self;
 }
 
+# TODO: problem! when this method is called as a callback from classify_all
+# in order to display results as they are generated, the tab does not get updated
+# until the processing has finished. Statusbar however is updated succesfully!
 sub add {
     my ($self, $result) = @_;
     $self->results->add( $result );
