@@ -20,10 +20,8 @@ use Class::XSAccessor {
 };
 
 sub new {
-    my ($class, $main) = @_;
+    my $class = shift;
     my $self = bless {}, $class;
-
-    $self->{main} = $main;
 
     return $self;
 }
