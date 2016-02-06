@@ -25,7 +25,7 @@ sub new {
 	$self->{main} = $main;
 	
 	$self->SetFieldsCount(4);
-    $self->SetStatusWidths(-1); # TODO: now equal size
+    $self->SetStatusWidths(-7, -1, -1, -1);
     
     $self->say("Status bar or cafe");
     
@@ -35,6 +35,7 @@ sub new {
 sub say {
 	my ($self, $msg) = @_;
 	$self->SetStatusText($msg, MAIN);
+	return $self;
 }
 
 1;
