@@ -40,6 +40,11 @@ sub new {
     return $self;
 }
 
+sub purpose {
+   my $self = shift;
+   return $self->dataset->purpose;
+}
+
 sub close {
     my $self = shift;    
     $self->dataset->close;
