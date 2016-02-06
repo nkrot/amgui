@@ -42,11 +42,17 @@ sub new {
     my @help = (
         "== USAGE ==",
         "1. Open a file in 'commas' format. File/Open or Ctrl-O",
-        "Once it is loaded, double click an item. It will be classified and results will appear in another tab",
+        "   Once it is loaded, double click an item. It will be classified and results will appear in another tab",
         "2. Open a project ('data' and 'test' files with training and testing datasets respectively) at once.",
-        "The testing dataset gets associated with the training dataset so that double clicking an item in testing",
-        "automatically uses associated training dataset.",
-        "3. TODO: Pressing Run or Ctrl+R classifies all items in the current dataset against associated training dataset"
+        "   The testing dataset gets associated with the training dataset so that double clicking an item in testing",
+        "   automatically uses associated training dataset.",
+        "3. TODO: Pressing Run or Ctrl+R classifies all items in a dataset",
+        "   Logic for determining which dataset is training and which one is testing is complex:",
+        "   the current tab is inspected and",
+        "   a) if the current tab is a testing dataset that was loaded in parallel with a training dataset,",
+        "      both datasets are used according to their primary purpose (data - as training, test as testing)",
+        "   b) if the current tab contains a dataset that was loaded alone, it is used as both training and testing",
+        "   c) all other cases are not yet processed"
     );
 
     my $self = $class->SUPER::new(
