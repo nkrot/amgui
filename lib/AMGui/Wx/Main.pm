@@ -247,13 +247,44 @@ sub on_file_quit {
 sub on_run_batch {
     my ($self, $event) = @_;
     
-    # TODO
-    # if no data was loaded, report it via a dialog
-    # if no item was selected, warn that a random item will be selected
-    #    and report the random item somewhere
-    #if ($self->{lbFileData})
+    my $testing;
+    my $training;
+    my $curr_page = $self->notebook->get_current_page;
     
-    $self->inform("I am running in batch mode:)");
+    if ( $curr_page and $curr_page->can('purpose') ) {
+        #warn "Purpose:" . $curr_page->purpose;
+        
+        if ( $curr_page->purpose eq 'results' ) {
+            # TODO: reach associated training dataset and use reuse it entirely?
+            # TODO: warn that current tab will be creared?
+            $self->inform("NOT IMPLEMENTED:\n This is the result tab. Switch to a dataset tab");
+            #$curr_page->classifier
+           
+        } elsif ( $curr_page->dataset->is_testing ) {
+            # given a testing dataset, use associated training dataset
+            $testing  = $curr_page->dataset;
+            $training = $testing->training;
+            
+        } elsif ( $curr_page->dataset->is_training ) {
+            $self->inform("NOT IMPLEMENTED.\nPlease switch to a tab with a testing dataset");
+            
+        } else {
+            $training = $curr_page->dataset;
+            $testing  = $training;
+        }
+    } else {
+        $self->inform("NOT IMPLEMENTED.\nPlease switch to a tab with a testing dataset");
+    }
+
+    if ( defined $testing ) {
+        # TODO: recycle existing result viewer
+        my $result_viewer = AMGui::Wx::ResultViewer->new($self->notebook);
+
+        my $am = AMGui::AM->new;
+        $am->set_training($training)->set_testing($testing);
+        $am->set_result_viewer($result_viewer);
+        $am->classify_all; 
+    }
 
     return 1;
 }
