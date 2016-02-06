@@ -99,4 +99,8 @@ sub set_classifier {
     $classifier->set_result_viewer( $self );
 }
 
+sub purpose {
+    return 'results';
+}
+
 1;
