@@ -65,11 +65,10 @@ sub on_double_click_item {
     
     my $item_idx = $self->GetSelection();
     my $item = $self->dataset->nth_item($item_idx);
-    
-    my $training = $self->dataset->training->data;
 
-    $self->classifier->set_dataset($training); # AMGui::DataSet->AM::DataSet
-    $self->classifier->classify($item);
+    my $training = $self->dataset->training->data; #=> AM::DataSet
+    
+    $self->classifier->set_training($training)->classify($item);
 }
 
 1;
