@@ -116,7 +116,7 @@ sub new {
 
     $self->create_tab($self->{help}, _T("Usage"));
  
-    $main->update_aui();
+    $main->update_aui;
 
     return $self;
 }
@@ -155,6 +155,23 @@ sub select_previous_tab {
     my $self = shift;
     $self->AdvanceSelection(0);
     return $self->GetSelection;
+}
+
+# replacement to non-available GetCurrentPage;
+sub get_current_page {
+    my $self = shift;
+    return $self->GetPage($self->GetSelection);
+}
+
+sub close_current_page {
+    my $self = shift;
+
+    my $id = $self->GetSelection;
+
+    my $page = $self->GetPage($id);
+    $page->close  if $page and $page->can('close');
+    
+    return $self->DeletePage($id);
 }
 
 ######################################################################
