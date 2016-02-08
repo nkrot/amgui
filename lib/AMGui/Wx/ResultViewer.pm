@@ -41,6 +41,8 @@ sub new {
     $self->{visible} = FALSE;
     
     $self->{statusbar_message} = '';
+    
+    #$self->{notshown} = 0;
 
     return $self;
 }
@@ -92,6 +94,41 @@ sub add {
 
     return $self;
 }
+
+# useless
+#sub add_lazily {
+#    my ($self, $result) = @_;
+#    $self->results->add( $result );
+#    $self->{notshown}++;
+#    
+#    if ( $self->{notshown} >= 100 ) {
+#        $self->show_lazily_added;
+#    }
+#
+#    return 1;
+#}
+
+#sub show_lazily_added {
+#    my $self = shift;
+#
+#    # add to GUI items that have not yet been added
+#    my @items;
+#    foreach my $result ( $self->results->last_n( $self->{notshown} ) ) {
+#        push @items, @{$self->results->as_strings( $result )};
+#    }
+#    $self->InsertItems(\@items, $self->GetCount);
+#
+#    # and update the GUI
+#    $self->show(TRUE); # switch to this tab
+#    # focus the last result
+#    my $last = $self->GetCount - 1;
+#    $self->SetSelection($last); # highlight the first line of the added result
+#    $self->SetFirstItem($last); # scrolls to the item
+#    
+#    $self->{notshown} = 0;
+#
+#    return $self;
+#}
 
 sub select {
     my $self = shift;

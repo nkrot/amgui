@@ -79,6 +79,7 @@ sub classify_all {
             $cnt_correct++  if $result->result eq 'correct';
 
             my $msg = "Total: " . $cnt_total . "; Correct: " . $cnt_correct;
+            #$self->result_viewer->add_lazily($result); # does not solve the problem
             $self->result_viewer->add($result);
             $self->result_viewer->show_in_statusbar($msg);
             
@@ -86,11 +87,11 @@ sub classify_all {
         }
     );
 
-    my @results = $self->classifier->classify_all( $self->testing->data );
+    #my @results = 
+    $self->classifier->classify_all( $self->testing->data );
+    #$self->result_viewer->show_lazily_added; # does not solve the problem
 
-    $self->{result} = 1;
-    
-    return $self->result;
+    return 1;
 }
 
 #sub example_from_analogize_pl {

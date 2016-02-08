@@ -52,6 +52,12 @@ sub as_string {
     return $str;
 }
 
+sub last_n {
+    my ($self, $n) = @_;
+    $n = 1 unless defined $n;
+    return @{$self->results}[-$n .. -1];
+}
+
 1;
 
 
