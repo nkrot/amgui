@@ -22,22 +22,22 @@ sub new {
     my ($class, $main, $dataset) = @_;
 
     my $self = $class->SUPER::new (
-        $main->notebook, 
-        wxID_ANY, 
-        wxDefaultPosition, 
-        wxDefaultSize, 
+        $main->notebook,
+        wxID_ANY,
+        wxDefaultPosition,
+        wxDefaultSize,
         $dataset->items_as_strings,
         wxLB_SINGLE
     );
     bless $self, $class;
-    
+
     $self->{main}          = $main;
     $self->{dataset}       = $dataset; # AMGui::Dataset
     $self->{title}         = $dataset->filename;
     $self->{result_viewer} = undef;
-    
+
     $main->notebook->AddPage($self, $self->{title}, 1);
-    $self->Deselect(0); 
+    $self->Deselect(0);
 
     Wx::Event::EVT_LISTBOX_DCLICK($self, $self->GetId, \&on_double_click_item);
 
@@ -50,7 +50,7 @@ sub purpose {
 }
 
 sub close {
-    my $self = shift;    
+    my $self = shift;
     $self->dataset->close;
     $self->unset_result_viewer;
     return 1;
@@ -65,9 +65,7 @@ sub set_result_viewer {
 
 sub unset_result_viewer {
     my $self = shift;
-    warn "Unsetting ResultViewer";
     if (defined $self->result_viewer) {
-        warn "Yeah, really unsetting the ResultViewer";
         my $viewer = $self->{result_viewer};
         $self->{result_viewer} = undef;
         $viewer->unset_dataset_viewer;
