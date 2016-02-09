@@ -9,19 +9,20 @@ our @ISA = 'Wx::ListBox';
 
 use Class::XSAccessor {
     getters => {
-        dataset    => 'dataset',
-        classifier => 'classifier'
+        main          => 'main',
+        dataset       => 'dataset',
+        result_viewer => 'result_viewer'
     },
     setters => {
-        set_classifier => 'classifier'
+        set_result_viewer => 'result_viewer'
     }
 };
 
 sub new {
-    my ($class, $parent, $dataset ) = @_;
+    my ($class, $main, $dataset) = @_;
 
     my $self = $class->SUPER::new (
-        $parent, 
+        $main->notebook, 
         wxID_ANY, 
         wxDefaultPosition, 
         wxDefaultSize, 
@@ -30,10 +31,12 @@ sub new {
     );
     bless $self, $class;
     
-    $self->{dataset} = $dataset;
-    $self->{title} = $dataset->filename;
+    $self->{main}          = $main;
+    $self->{dataset}       = $dataset;
+    $self->{title}         = $dataset->filename;
+    $self->{result_viewer} = undef;
     
-    $parent->AddPage($self, $self->{title}, 1);
+    $main->notebook->AddPage($self, $self->{title}, 1);
 
     Wx::Event::EVT_LISTBOX_DCLICK($self, $self->GetId, \&on_double_click_item);
 
@@ -48,7 +51,7 @@ sub purpose {
 sub close {
     my $self = shift;    
     $self->dataset->close;
-    $self->classifier->close;
+    # TODO: unlink ResultViewer, but do not close
     return 1;
 }
 
