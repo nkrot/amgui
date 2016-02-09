@@ -59,7 +59,7 @@ sub close {
 # Classify given test item using preset training set
 sub classify {
     my ($self, $test_item) = @_;
-    $self->{classifier} = Algorithm::AM->new(training_set => $self->training);
+    $self->{classifier} = Algorithm::AM->new(training_set => $self->training->data);
     $self->{result} = $self->classifier->classify( $test_item ); #=> AM::Result
     
     $self->result_viewer->add( $self->result );

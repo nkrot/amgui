@@ -32,7 +32,7 @@ sub new {
     bless $self, $class;
     
     $self->{main}          = $main;
-    $self->{dataset}       = $dataset;
+    $self->{dataset}       = $dataset; # AMGui::Dataset
     $self->{title}         = $dataset->filename;
     $self->{result_viewer} = undef;
     
@@ -93,9 +93,9 @@ sub current_item {
     return $self->dataset->nth_item( $self->GetSelection );
 }
 
-sub training_data {
+sub training {
     my $self = shift;
-    return $self->dataset->training->data; #=> AM::DataSet
+    return $self->dataset->training; #=> AMGui::DataSet
 }
 
 1;

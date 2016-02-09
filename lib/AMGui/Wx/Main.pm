@@ -266,26 +266,28 @@ sub on_run_batch {
             $training = $testing->training;
             
         } elsif ( $curr_page->dataset->is_training ) {
-            $self->inform("Please switch to a tab with a testing dataset");
+            $self->inform("Please switch to a tab with a testing dataset.");
             
         } else {
             $training = $curr_page->dataset;
             $testing  = $training;
         }
     } else {
-        $self->inform("Please switch to a tab with a testing dataset and try again");
+        $self->inform("Please switch to a tab with a testing dataset and try again.");
     }
 
     if ( defined $testing ) {
-        # TODO: recycle existing result viewer?
-        # be careful! newly created ResultViewer must not override other ResultViewers
-        # that may already be associated with the dataset viewer
-        my $result_viewer = AMGui::Wx::ResultViewer->new($self);
+        if ( $self->is_valid_dataset($training, MSG_TRAINING_NOT_FOUND) ) {
+            # TODO: recycle existing result viewer?
+            # be careful! newly created ResultViewer must not override other ResultViewers
+            # that may already be associated with the dataset viewer
+            my $result_viewer = AMGui::Wx::ResultViewer->new($self);
 
-        my $am = AMGui::AM->new;
-        $am->set_training($training)->set_testing($testing);
-        $am->set_result_viewer($result_viewer);
-        $am->classify_all; 
+            my $am = AMGui::AM->new;
+            $am->set_training($training)->set_testing($testing);
+            $am->set_result_viewer($result_viewer);
+            $am->classify_all; 
+        }
     }
 
     return 1;
@@ -297,21 +299,23 @@ sub classify_item {
     # get data item highlighted in the current DatasetViewer
     my $test_item = $dataset_viewer->current_item;  #=> AM::DataSet::Item
     # reach training dataset associated with the dataset loaded in the current DatasetViewer
-    my $training  = $dataset_viewer->training_data; #=> AM::DataSet
-
-    # we want any new item from the current DatasetViewer to be outputted into
-    # the same ResultViewer upon classification. If DatasetViewer already has
-    # a ResultViewer associated with it, the latter will be reused. Otherwise
-    # we create one and associate it with DatasetViewer.
-    unless (defined $dataset_viewer->result_viewer) {
-        $dataset_viewer->set_result_viewer( AMGui::Wx::ResultViewer->new($self) );
-    }
+    my $training  = $dataset_viewer->training; #=> AMGui::DataSet
     
-    # finally, create a classifier and run it
-    my $am = AMGui::AM->new;
-    $am->set_training($training); #TODO: ->set_testing($test_item);
-    $am->set_result_viewer($dataset_viewer->result_viewer);
-    $am->classify($test_item);
+    if ( $self->is_valid_dataset($training, MSG_TRAINING_NOT_FOUND) ) {
+        # we want any new item from the current DatasetViewer to be outputted into
+        # the same ResultViewer upon classification. If DatasetViewer already has
+        # a ResultViewer associated with it, the latter will be reused. Otherwise
+        # we create one and associate it with DatasetViewer.
+        unless (defined $dataset_viewer->result_viewer) {
+            $dataset_viewer->set_result_viewer( AMGui::Wx::ResultViewer->new($self) );
+        }
+    
+        # finally, create a classifier and run it
+        my $am = AMGui::AM->new;
+        $am->set_training($training); #TODO: ->set_testing($test_item);
+        $am->set_result_viewer($dataset_viewer->result_viewer);
+        $am->classify($test_item);
+    }
     
     return 1;
 }
@@ -333,7 +337,6 @@ sub on_help_contents {
     $self->inform("Help::Contents not yet implemented");
     $event->Skip;
 }
-
 
 sub on_help_about {
     my ($self, $event) = @_;
@@ -411,6 +414,18 @@ sub setup_data_viewer {
     return $dataset_viewer;
 }
 
+sub is_valid_dataset {
+    my ($self, $dataset, $msg) = @_;
+    my $status = TRUE;
+    if (defined $dataset && defined $dataset->data) {
+        # ok
+    } else {
+        $status = FALSE;
+        $self->show_error($msg);
+    }
+    return $status;
+}
+
 ######################################################################
 
 sub update_aui {
@@ -428,5 +443,11 @@ sub inform {
     return 1;
 }
 
+sub show_error {
+    my ($self, $msg) = @_;
+    Wx::MessageBox($msg, "Error", Wx::wxOK|Wx::wxICON_ERROR);
+    return 1;
+   
+}
 
 1;
