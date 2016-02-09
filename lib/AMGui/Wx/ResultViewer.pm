@@ -20,12 +20,12 @@ use Class::XSAccessor {
 
 sub new {
     my ($class, $main) = @_;
-    
+
     my $self = $class->SUPER::new (
-        $main->notebook, 
-        Wx::wxID_ANY, 
-        Wx::wxDefaultPosition, 
-        Wx::wxDefaultSize, 
+        $main->notebook,
+        Wx::wxID_ANY,
+        Wx::wxDefaultPosition,
+        Wx::wxDefaultSize,
         [],
         Wx::wxLB_SINGLE
     );
@@ -34,13 +34,13 @@ sub new {
     $self->Hide;
 
     $self->{main} = $main;
-    
+
     $self->{results} = AMGui::Results->new;
     $self->{title} = "Result";
 
     $self->{notebook} = $main->notebook;
     $self->{visible} = FALSE;
-    
+
     $self->{statusbar_message} = '';
 
     # DatasetViewer associated with this ResultViewer
@@ -53,14 +53,13 @@ sub new {
 
 sub close {
     my $self = shift;
-    warn "Closing resultViewer";
     $self->unset_dataset_viewer;
 }
 
 sub set_dataset_viewer {
     my ($self, $viewer) = @_;
     $self->{dataset_viewer} = $viewer;
-    
+
     # CAREFUL a DatasetViewer can have more than one ResultViewers,
     # one for batch mode and another one for simple classify-one mode.
     # Most likely, setting a backlink here does not make sense, since
@@ -82,17 +81,17 @@ sub unset_dataset_viewer {
 sub show {
     my ($self, $select) = @_;
     $select = FALSE  unless defined $select;
-    
+
     unless ( $self->{visible} ) {
         $self->{index} = $self->notebook->GetPageCount();
         $self->{notebook}->AddPage($self, $self->{title}, TRUE);
         $self->{visible} = TRUE;
     }
-    
+
     if ( $select ) {
         $self->select;
     }
-    
+
     return $self;
 }
 
@@ -111,16 +110,16 @@ sub add {
     $self->results->add( $result );
 
     $self->show(TRUE); # and switch to this very tab
-    
+
     my $count = $self->GetCount;
 
     my $items = $self->results->as_strings( $result );
     $self->InsertItems( $items, $count );
-    
+
     # focus the most recent result
     $self->SetSelection($count); # highlight the first line of the added result
     $self->SetFirstItem($count); # scrolls to the item
-    
+
     #$self->main->update_aui;
     #$self->notebook->Update;
 
@@ -132,7 +131,7 @@ sub add {
 #    my ($self, $result) = @_;
 #    $self->results->add( $result );
 #    $self->{notshown}++;
-#    
+#
 #    if ( $self->{notshown} >= 100 ) {
 #        $self->show_lazily_added;
 #    }
@@ -156,7 +155,7 @@ sub add {
 #    my $last = $self->GetCount - 1;
 #    $self->SetSelection($last); # highlight the first line of the added result
 #    $self->SetFirstItem($last); # scrolls to the item
-#    
+#
 #    $self->{notshown} = 0;
 #
 #    return $self;
