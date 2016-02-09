@@ -403,17 +403,9 @@ sub setup_data_viewer {
     my $dataset = AMGui::DataSet->new(%args);
     $dataset->set_purpose($dataset_purpose) if defined $dataset_purpose;
     
-    # an instance of AM classifier
-    my $classifier = AMGui::AM->new;
-    
-    # GUI component for showing exemplars and running the classifier
-    my $dataset_viewer = AMGui::Wx::DatasetViewer->new($self->notebook, $dataset);
-    $dataset_viewer->set_classifier($classifier);
-
-    # GUI component for showing classification results
-    my $result_viewer = AMGui::Wx::ResultViewer->new($self->notebook);
-    $result_viewer->set_classifier($classifier);
-    
+    # GUI component for showing exemplars
+    my $dataset_viewer = AMGui::Wx::DatasetViewer->new($self, $dataset);
+   
     return $dataset_viewer;
 }
 
