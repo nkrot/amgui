@@ -41,7 +41,7 @@ sub new {
     $pos    = wxDefaultPosition  unless defined $pos;
     $size   = wxDefaultSize      unless defined $size;
     $name   = ""                 unless defined $name;
-    $style  = wxDEFAULT_FRAME_STYLE 
+    $style  = wxDEFAULT_FRAME_STYLE
         unless defined $style;
 
     my $self = $class->SUPER::new($parent, $id, $title, $pos, $size, $style, $name);
@@ -51,17 +51,17 @@ sub new {
 
     $self->SetTitle(_T("AM Gui"));
     $self->SetSize(Wx::Size->new(900, 700));
-    
+
     #$self->{grid_1}->CreateGrid(10, 3);
     #$self->{grid_1}->SetSelectionMode(wxGridSelectCells);
-   
+
     $self->{aui} = AMGui::Wx::AuiManager->new($self);
 
     $self->{cwd} = Cwd::cwd();
 
     $self->{menubar} = AMGui::Wx::Menubar->new($self);
     $self->SetMenuBar($self->{menubar}->menubar);
-    
+
     $self->{statusbar} = AMGui::Wx::StatusBar->new($self);
     $self->SetStatusBar($self->{statusbar});
 
@@ -116,15 +116,15 @@ sub on_file_new {
 
 sub on_file_open {
     my ($self, $event) = @_;
-    
+
     my $wildcard = join(
         '|',
         _T('All Files'),  ( AMGui::Constant::WIN32 ? '*.*' : '*' ),
         _T('CSV Files'),  '*.csv;*.CSV',
         _T('Text Files'), '*.txt;*.TXT'
     );
-    
-    my $fileDlg = Wx::FileDialog->new( 
+
+    my $fileDlg = Wx::FileDialog->new(
         $self,
         _T('Open Files'),
         $self->cwd,    # Default directory
@@ -138,7 +138,7 @@ sub on_file_open {
     {
         my @filenames = $fileDlg->GetFilenames;
         $self->{cwd} = $fileDlg->GetDirectory;
-        
+
         my @files;
         foreach my $filename (@filenames) {
 
@@ -158,10 +158,10 @@ sub on_file_open {
 
             push @files, $fname
         }
-        
+
         $self->setup_data_viewers(\@files) if scalar(@files) > 0;
     }
-    
+
     return 1;
 }
 
@@ -175,7 +175,7 @@ sub on_file_open_project {
         _T('All Files'),     ( AMGui::Constant::WIN32 ? '*.*' : '*' )
      );
 
-    my $file_dlg = Wx::FileDialog->new( 
+    my $file_dlg = Wx::FileDialog->new(
         $self,
         _T('Open Training and Testing datasets at once'),
         $self->cwd,    # Default directory
@@ -192,7 +192,7 @@ sub on_file_open_project {
 
         # TODO: check that there are exactly two files
         # and swear otherwise
-        
+
         my (@files, @data_types);
         foreach my $filename (@filenames) {
             # Construct full paths, correctly for each platform
@@ -210,7 +210,7 @@ sub on_file_open_project {
             }
 
             push @files, $fname;
-            
+
             if ( lc $filename eq 'data' ) {
                 push @data_types, AMGui::DataSet::TRAINING;
             } elsif (lc $filename eq 'test') {
@@ -219,7 +219,7 @@ sub on_file_open_project {
                 #TODO: react meaningfully
             }
         }
-        
+
         if ( scalar(@files) == 2 ) {
             $self->setup_data_viewers(\@files, \@data_types);
         } else {
@@ -248,14 +248,14 @@ sub on_file_quit {
 # TODO: refactor a la on_run_next_item?
 sub on_run_batch {
     my ($self, $event) = @_;
-    
+
     my $testing;
     my $training;
     my $curr_page = $self->notebook->get_current_page;
-    
+
     if ( $curr_page and $curr_page->can('purpose') ) {
         #warn "Purpose:" . $curr_page->purpose;
-        
+
         if ( $curr_page->purpose eq 'results' ) {
             if (defined $curr_page->dataset_viewer) {
                 # this Results tab was produced by classify_item method
@@ -265,15 +265,15 @@ sub on_run_batch {
                 # this Results tab was produced by on_run_batch method
                 $self->error("This is the result tab. Please switch to a dataset tab.");
             }
-           
+
         } elsif ( $curr_page->dataset->is_testing ) {
             # given a testing dataset, use associated training dataset
             $testing  = $curr_page->dataset;
             $training = $testing->training;
-            
+
         } elsif ( $curr_page->dataset->is_training ) {
             $self->error("Please switch to a tab with a testing dataset.");
-            
+
         } else {
             # Dataset that was loaded alone.
             # This dataset is used both as training and as testing (leave-one-out)
@@ -293,7 +293,7 @@ sub on_run_batch {
         my $am = AMGui::AM->new;
         $am->set_training($training)->set_testing($testing);
         $am->set_result_viewer($result_viewer);
-        $am->classify_all; 
+        $am->classify_all;
     }
 
     return 1;
@@ -306,20 +306,20 @@ sub on_run_next_item {
     my $dv_testing; # DatasetViewer with the testing dataset
     my $training;
     my $curr_page = $self->notebook->get_current_page;
-    
+
     if ( $curr_page and $curr_page->can('purpose') ) {
         #warn "Purpose:" . $curr_page->purpose;
-        
+
         if ( $curr_page->purpose eq 'results' ) {
             $dv_testing = $curr_page->dataset_viewer;
-           
+
         } elsif ( $curr_page->dataset->is_testing ) {
             # given a testing dataset, use associated training dataset
             $dv_testing = $curr_page;
-            
+
         } elsif ( $curr_page->dataset->is_training ) {
             $self->error("Please switch to a tab with a testing dataset.");
-            
+
         } else {
             # Dataset that was loaded alone.
             # This dataset is used both as training and as testing (leave-one-out)
@@ -344,18 +344,18 @@ sub on_run_next_item {
             $self->inform("No more exemplars available.");
         }
     }
-    
+
     return 1;
 }
 
 sub classify_item {
     my ($self, $dataset_viewer) = @_;
-    
+
     # get data item highlighted in the current DatasetViewer
     my $test_item = $dataset_viewer->current_item;  #=> AM::DataSet::Item
     # reach training dataset associated with the dataset loaded in the current DatasetViewer
     my $training  = $dataset_viewer->training; #=> AMGui::DataSet
-    
+
     if ( $self->is_valid_dataset($training, MSG_TRAINING_NOT_FOUND) ) {
         # we want any new item from the current DatasetViewer to be outputted into
         # the same ResultViewer upon classification. If DatasetViewer already has
@@ -364,14 +364,14 @@ sub classify_item {
         unless (defined $dataset_viewer->result_viewer) {
             $dataset_viewer->set_result_viewer( AMGui::Wx::ResultViewer->new($self) );
         }
-    
+
         # finally, create a classifier and run it
         my $am = AMGui::AM->new;
         $am->set_training($training); #TODO: ->set_testing($test_item);
         $am->set_result_viewer($dataset_viewer->result_viewer);
         $am->classify($test_item);
     }
-    
+
     return 1;
 }
 
@@ -384,7 +384,7 @@ sub on_next_tab {
 sub on_previous_tab {
     my ($self, $event) = @_;
     $self->notebook->select_previous_tab;
-    return 1;  
+    return 1;
 }
 
 sub on_help_contents {
@@ -423,7 +423,7 @@ sub setup_data_viewers {
         push @data_viewers, $dv;
         $training = $dv->dataset  if $dv->dataset->is_training;
     }
-    
+
     # each test dataset must be linked to corresponding training dataset
     if ( $training ) {
         foreach my $dv (@data_viewers) {
@@ -432,7 +432,7 @@ sub setup_data_viewers {
             }
         }
     }
-    
+
     return scalar @data_viewers;
 }
 
@@ -454,7 +454,7 @@ dataset_purpose is either 'training' or 'testing'
 
 sub setup_data_viewer {
     my ($self, $file, $dataset_purpose) = @_;
-    
+
     # load exemplars from file
     my %args = (
         path   => $file,
@@ -462,10 +462,10 @@ sub setup_data_viewer {
     );
     my $dataset = AMGui::DataSet->new(%args);
     $dataset->set_purpose($dataset_purpose) if defined $dataset_purpose;
-    
+
     # GUI component for showing exemplars
     my $dataset_viewer = AMGui::Wx::DatasetViewer->new($self, $dataset);
-   
+
     return $dataset_viewer;
 }
 
@@ -487,7 +487,7 @@ sub update_aui {
     my $self = shift;
     #return if $self->locked('refresh_aui');
     $self->aui->Update;
-    return;    
+    return;
 }
 
 ######################################################################
@@ -502,7 +502,7 @@ sub error {
     my ($self, $msg) = @_;
     Wx::MessageBox(_T($msg), "Error", Wx::wxOK|Wx::wxICON_ERROR);
     return 1;
-   
+
 }
 
 1;

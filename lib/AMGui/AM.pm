@@ -6,7 +6,7 @@ use warnings;
 use Algorithm::AM;
 use Algorithm::AM::Batch;
 use AMGui::Results;
- 
+
 use Class::XSAccessor {
     getters => {
         classifier    => 'classifier',
@@ -61,7 +61,7 @@ sub classify {
     my ($self, $test_item) = @_;
     $self->{classifier} = Algorithm::AM->new(training_set => $self->training->data);
     $self->{result} = $self->classifier->classify( $test_item ); #=> AM::Result
-    
+
     $self->result_viewer->add( $self->result );
     $self->result_viewer->show_in_statusbar("Predicted class is " . $self->result->result);
 
@@ -71,10 +71,10 @@ sub classify {
 sub classify_all {
     my ($self, $testing) = @_;
     $self->set_testing($testing)  if defined $testing;
-    
+
     my $cnt_total = $self->testing->size;
     my $cnt_correct = 0;
-    
+
     $self->{classifier} = Algorithm::AM::Batch->new(
         training_set  => $self->training->data,
         end_test_hook => sub {
@@ -85,12 +85,12 @@ sub classify_all {
             #$self->result_viewer->add_lazily($result); # does not solve the problem
             $self->result_viewer->add($result);
             $self->result_viewer->show_in_statusbar($msg);
-            
+
             #print $test_item->comment . ' ' . $result->result . "\n";
         }
     );
 
-    #my @results = 
+    #my @results =
     $self->classifier->classify_all( $self->testing->data );
     #$self->result_viewer->show_lazily_added; # does not solve the problem
 
