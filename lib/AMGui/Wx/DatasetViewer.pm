@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Wx qw[:everything];
+use AMGui::Constant;
 
 our @ISA = 'Wx::ListBox';
 
@@ -90,6 +91,32 @@ sub on_double_click_item {
 sub current_item {
     my $self = shift;
     return $self->dataset->nth_item( $self->GetSelection );
+}
+
+sub advance_selection {
+    my $self = shift;
+
+    my $curr_idx = $self->GetSelection;
+    my $next_idx;
+
+    if ( $curr_idx == Wx::wxNOT_FOUND ) {
+        $next_idx = 0;
+    } elsif ($curr_idx+1 == $self->GetCount) {
+        # looking at the last item, keep it selected
+    } else {
+        ##$self->Deselect($curr_idx); # applies to wxLDB_MULTIPLE
+        $next_idx = $curr_idx+1;
+    }
+
+    if (defined $next_idx) {
+        # TODO: this should also set the focus to the current item but
+        # it does not. The effect is that pressing UpArrow or DownArrow
+        # does not select the items around the highlighted one but
+        # around a focused one, which is one somewhere among previous items
+        $self->SetSelection($next_idx);
+    }
+
+    return defined $next_idx;
 }
 
 sub training {
