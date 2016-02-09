@@ -37,6 +37,7 @@ sub new {
     $self->{result_viewer} = undef;
     
     $main->notebook->AddPage($self, $self->{title}, 1);
+    $self->Deselect(0); 
 
     Wx::Event::EVT_LISTBOX_DCLICK($self, $self->GetId, \&on_double_click_item);
 
