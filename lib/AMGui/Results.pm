@@ -14,11 +14,11 @@ use Class::XSAccessor {
 
 sub new {
     my $class = shift;
-    
+
     my $self = bless {}, $class;
 
     $self->{results} = ();
-  
+
     return $self;
 }
 
@@ -42,7 +42,7 @@ sub as_strings {
 # a method for converting to a string should rather be added to the classes handled here
 sub as_string {
     my ($self, $obj) = @_;
-    
+
     my $str = undef;
     if ( $obj->isa("Algorithm::AM::DataSet::Item") ) {
         $str = $obj->class . ",\t" . join("\t", @{$obj->features}) . "\t," . $obj->comment;

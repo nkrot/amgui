@@ -38,7 +38,7 @@ sub new {
     $name  = ""                 unless defined $name;
 
     my $aui = $main->aui;
-    
+
     my @help = (
         "== USAGE ==",
         "1. Open a file in 'commas' format. File/Open or Ctrl-O",
@@ -66,9 +66,9 @@ sub new {
         Wx::wxAUI_NB_TOP | Wx::wxBORDER_NONE | Wx::wxAUI_NB_SCROLL_BUTTONS | Wx::wxAUI_NB_TAB_MOVE
             | Wx::wxAUI_NB_CLOSE_ON_ACTIVE_TAB | Wx::wxAUI_NB_WINDOWLIST_BUTTON
     );
-    
+
     $self->{main} = $main;
-    
+
     $aui->AddPane(
         $self,
         AMGui::Wx->aui_pane_info(
@@ -84,47 +84,47 @@ sub new {
             Layer          => 1,
             )->Center,
     );
-	
+
     $aui->caption('notebook' => _T('Hello'), );
 
     Wx::Event::EVT_AUINOTEBOOK_PAGE_CHANGED(
-        $self, $self, 
+        $self, $self,
         sub { shift->on_auinotebook_page_changed(@_); }, );
 
     #Wx::Event::EVT_AUINOTEBOOK_PAGE_CLOSE(
-#        $main, $self, 
+#        $main, $self,
 #        sub { shift->on_close_tab(@_); }, );
 
     # this event does not happen, thank you, AUINotebook developers
 #    Wx::Event::EVT_AUINOTEBOOK_DRAG_MOTION(
-#        $self, $self, 
+#        $self, $self,
 #        sub { shift->on_auinotebook_drag_motion(@_)}, );
 
     Wx::Event::EVT_AUINOTEBOOK_DRAG_DONE(
-        $self, $self, 
+        $self, $self,
         sub { shift->on_auinotebook_drag_done(@_)}, );
 
     # this event does not happen, thank you, AUINotebook developers
 #    Wx::Event::EVT_AUINOTEBOOK_BEGIN_DRAG(
-#        $self, $self, 
+#        $self, $self,
 #        sub { shift->on_auinotebook_begin_drag(@_)}, );
-    
+
     # this event does not happen, thank you, AUINotebook developers
 #    Wx::Event::EVT_AUINOTEBOOK_END_DRAG(
-#        $self, $self, 
+#        $self, $self,
 #        sub { shift->on_auinotebook_end_drag(@_)}, );
 
     $self->{help} = Wx::ListBox->new(
-        $self, 
-        wxID_ANY, 
+        $self,
+        wxID_ANY,
         wxDefaultPosition,
-        wxDefaultSize, 
+        wxDefaultSize,
         \@help,
         wxLB_SINGLE
     );
 
     $self->create_tab($self->{help}, _T("Usage"));
- 
+
     $main->update_aui;
 
     return $self;
@@ -179,7 +179,7 @@ sub close_current_page {
 
     my $page = $self->GetPage($id);
     $page->close  if $page and $page->can('close');
-    
+
     return $self->DeletePage($id);
 }
 
