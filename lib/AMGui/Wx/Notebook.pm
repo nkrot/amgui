@@ -27,7 +27,7 @@ use Class::XSAccessor {
 # 1. after tabs were rearranged by dragging, their retain their initial index.
 #    the effect is that NextTab and PreviousTab are incorrect.
 #    This seems to be a lang-lasting BUG
-# 2. Only a few events are actually dispatched
+# 2. Only a few events are actually dispatched. wxPerl sucks!
 
 sub new {
     my( $class, $main, $id, $pos, $size, $style, $name ) = @_;
@@ -52,7 +52,10 @@ sub new {
         "   a) if the current tab is a testing dataset that was loaded in parallel with a training dataset,",
         "      both datasets are used according to their primary purpose (data - as training, test as testing)",
         "   b) if the current tab contains a dataset that was loaded alone, it is used as both training and testing",
-        "   c) all other cases are not yet processed"
+        "   c) all other cases are not yet processed",
+        "4. When on a Result tab, pressing Ctrl-R runs the classification on the *next after highlighted* item in",
+        "   the associated Testing dataset and displays classification results in the Results tab.",
+        "   The same when on Testing dataset tab."
     );
 
     my $self = $class->SUPER::new(
