@@ -29,7 +29,7 @@ use constant FALSE => 0;
 use constant TRUE  => 1;
 
 # I know this is a bad idea
-use constant MSG_TRAINING_NOT_FOUND => 
+use constant MSG_TRAINING_NOT_FOUND =>
     "Could not find associated Training dataset.\nPerhaps you have closed the tab?";
 
 1;
