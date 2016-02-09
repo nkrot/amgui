@@ -61,7 +61,10 @@ sub classify {
     my ($self, $test_item) = @_;
     $self->{classifier} = Algorithm::AM->new(training_set => $self->training);
     $self->{result} = $self->classifier->classify( $test_item ); #=> AM::Result
-    $self->{result_viewer}->add( $self->result ); # TODO: do it outside?
+    
+    $self->result_viewer->add( $self->result );
+    $self->result_viewer->show_in_statusbar("Predicted class is " . $self->result->result);
+
     return $self->result;
 }
 
@@ -76,7 +79,7 @@ sub classify_all {
         training_set  => $self->training->data,
         end_test_hook => sub {
             my ($batch, $test_item, $result) = @_;
-            $cnt_correct++  if $result->result eq 'correct';
+            $cnt_correct++  if $result->result eq 'correct'; # TODO: AM::Result->is_correct
 
             my $msg = "Total: " . $cnt_total . "; Correct: " . $cnt_correct;
             #$self->result_viewer->add_lazily($result); # does not solve the problem
