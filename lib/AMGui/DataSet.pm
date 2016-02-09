@@ -33,12 +33,12 @@ sub new {
     while (my ($key,$value) = each %args) {
         $self->{$key} = $value;
     }
-    
+
     $self->{data}     = Algorithm::AM::DataSet::dataset_from_file(%args);
     $self->{filename} = ( File::Spec->splitpath( $self->path ) )[-1];
     $self->{purpose}  = undef ; # TRAINING or TESTING
     $self->{training} = $self;
-     
+
     return $self;
 }
 
