@@ -10,10 +10,11 @@ our @ISA = 'Wx::ListBox';
 
 use Class::XSAccessor {
     getters => {
-        main     => 'main',
-        results  => 'results', # AMGui::Result (collection)
-        notebook => 'notebook',
-        index    => 'index'
+        main           => 'main',
+        notebook       => 'notebook',
+        index          => 'index',
+        results        => 'results', # AMGui::Result (collection)
+        dataset_viewer => 'dataset_viewer'
     }
 };
 
@@ -41,10 +42,41 @@ sub new {
     $self->{visible} = FALSE;
     
     $self->{statusbar_message} = '';
-    
+
+    # DatasetViewer associated with this ResultViewer
+    $self->{dataset_viewer} = undef;
+
     #$self->{notshown} = 0;
 
     return $self;
+}
+
+sub close {
+    my $self = shift;
+    warn "Closing resultViewer";
+    $self->unset_dataset_viewer;
+}
+
+sub set_dataset_viewer {
+    my ($self, $viewer) = @_;
+    $self->{dataset_viewer} = $viewer;
+    
+    # CAREFUL a DatasetViewer can have more than one ResultViewers,
+    # one for batch mode and another one for simple classify-one mode.
+    # Most likely, setting a backlink here does not make sense, since
+    # a ResultViewer is never created *before* a DatasetViewer has been
+    # created.
+    #$viewer->set_result_viewer($self); #will cause infinite mutual recursion
+}
+
+sub unset_dataset_viewer {
+    my $self = shift;
+    if (defined $self->{dataset_viewer}) {
+        my $viewer = $self->dataset_viewer;
+        $self->{dataset_viewer} = undef;
+        $viewer->unset_result_viewer;
+    }
+    return 1;
 }
 
 sub show {

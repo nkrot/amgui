@@ -13,9 +13,9 @@ use Class::XSAccessor {
         dataset       => 'dataset',
         result_viewer => 'result_viewer'
     },
-    setters => {
-        set_result_viewer => 'result_viewer'
-    }
+    # setters => {
+        # set_result_viewer => 'result_viewer'
+    # }
 };
 
 sub new {
@@ -51,7 +51,26 @@ sub purpose {
 sub close {
     my $self = shift;    
     $self->dataset->close;
-    # TODO: unlink ResultViewer, but do not close
+    $self->unset_result_viewer;
+    return 1;
+}
+
+sub set_result_viewer {
+    my ($self, $viewer) = @_;
+    $self->{result_viewer} = $viewer;
+    $viewer->set_dataset_viewer($self); # create a backlink ResultViewer->DatasetViewer
+    return 1;
+}
+
+sub unset_result_viewer {
+    my $self = shift;
+    warn "Unsetting ResultViewer";
+    if (defined $self->result_viewer) {
+        warn "Yeah, really unsetting the ResultViewer";
+        my $viewer = $self->{result_viewer};
+        $self->{result_viewer} = undef;
+        $viewer->unset_dataset_viewer;
+    }
     return 1;
 }
 
