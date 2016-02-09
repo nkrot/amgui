@@ -278,7 +278,7 @@ sub on_run_batch {
 
     if ( defined $testing ) {
         # TODO: recycle existing result viewer
-        my $result_viewer = AMGui::Wx::ResultViewer->new($self->notebook);
+        my $result_viewer = AMGui::Wx::ResultViewer->new($self);
 
         my $am = AMGui::AM->new;
         $am->set_training($training)->set_testing($testing);
