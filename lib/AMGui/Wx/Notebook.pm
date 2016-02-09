@@ -46,7 +46,7 @@ sub new {
         "2. Open a project ('data' and 'test' files with training and testing datasets respectively) at once.",
         "   The testing dataset gets associated with the training dataset so that double clicking an item in testing",
         "   automatically uses associated training dataset.",
-        "3. TODO: Pressing Run or Ctrl+Shift+R classifies all items in a dataset",
+        "3. Pressing Run or Ctrl+Shift+R classifies all items in a dataset",
         "   Logic for determining which dataset is training and which one is testing is complex:",
         "   the current tab is inspected and",
         "   a) if the current tab is a testing dataset that was loaded in parallel with a training dataset,",
