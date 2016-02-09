@@ -9,19 +9,19 @@ use warnings;
 #our @ISA = qw(Exporter);
 
 our @EXPORT = qw(
-    wxID_RUN_BATCH
+    wxID_RUN_BATCH wxID_RUN_NEXT
     wxID_OPEN_PROJECT
-    wxID_NEXT_TAB
-    wxID_PREV_TAB
+    wxID_NEXT_TAB wxID_PREV_TAB
     FALSE TRUE
     MSG_TRAINING_NOT_FOUND
     );
 #our @EXPORT_OK = qw( wxID_RUN SHILO );
 
 use constant wxID_RUN_BATCH    => 1000;
-use constant wxID_OPEN_PROJECT => 1001;
-use constant wxID_NEXT_TAB     => 1002;
-use constant wxID_PREV_TAB     => 1003;
+use constant wxID_RUN_NEXT     => 1001;
+use constant wxID_OPEN_PROJECT => 1002;
+use constant wxID_NEXT_TAB     => 1003;
+use constant wxID_PREV_TAB     => 1004;
 
 use constant WIN32 => !!( ( $^O eq 'MSWin32' ) or ( $^O eq 'cygwin' ) );
 
