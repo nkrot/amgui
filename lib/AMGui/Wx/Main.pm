@@ -72,6 +72,7 @@ sub new {
     Wx::Event::EVT_MENU($self, wxID_OPEN_PROJECT,  \&on_file_open_project);
     Wx::Event::EVT_MENU($self, wxID_CLOSE,         \&on_file_close);
     Wx::Event::EVT_MENU($self, wxID_EXIT,          \&on_file_quit);
+    Wx::Event::EVT_MENU($self, wxID_RUN_NEXT,      \&on_run_next_item);
     Wx::Event::EVT_MENU($self, wxID_RUN_BATCH,     \&on_run_batch);
     Wx::Event::EVT_MENU($self, wxID_NEXT_TAB,      \&on_next_tab);
     Wx::Event::EVT_MENU($self, wxID_PREV_TAB,      \&on_previous_tab);
@@ -244,6 +245,7 @@ sub on_file_quit {
     $self->Close(1);
 }
 
+# TODO: refactor a la on_run_next_item?
 sub on_run_batch {
     my ($self, $event) = @_;
     
@@ -255,10 +257,14 @@ sub on_run_batch {
         #warn "Purpose:" . $curr_page->purpose;
         
         if ( $curr_page->purpose eq 'results' ) {
-            # TODO: reach associated training dataset and use reuse it entirely?
-            # TODO: warn that current tab will be cleared?
-            $self->inform("This is the result tab. Please switch to a dataset tab");
-            #$curr_page->classifier
+            if (defined $curr_page->dataset_viewer) {
+                # this Results tab was produced by classify_item method
+                $testing  = $curr_page->dataset_viewer->dataset;
+                $training = $testing->training;
+            } else {
+                # this Results tab was produced by on_run_batch method
+                $self->error("This is the result tab. Please switch to a dataset tab.");
+            }
            
         } elsif ( $curr_page->dataset->is_testing ) {
             # given a testing dataset, use associated training dataset
@@ -266,9 +272,11 @@ sub on_run_batch {
             $training = $testing->training;
             
         } elsif ( $curr_page->dataset->is_training ) {
-            $self->inform("Please switch to a tab with a testing dataset.");
+            $self->error("Please switch to a tab with a testing dataset.");
             
         } else {
+            # Dataset that was loaded alone.
+            # This dataset is used both as training and as testing (leave-one-out)
             $training = $curr_page->dataset;
             $testing  = $training;
         }
@@ -276,20 +284,67 @@ sub on_run_batch {
         $self->inform("Please switch to a tab with a testing dataset and try again.");
     }
 
-    if ( defined $testing ) {
-        if ( $self->is_valid_dataset($training, MSG_TRAINING_NOT_FOUND) ) {
-            # TODO: recycle existing result viewer?
-            # be careful! newly created ResultViewer must not override other ResultViewers
-            # that may already be associated with the dataset viewer
-            my $result_viewer = AMGui::Wx::ResultViewer->new($self);
+    if ( defined $testing && $self->is_valid_dataset($training, MSG_TRAINING_NOT_FOUND) ) {
+        # TODO: recycle existing result viewer?
+        # be careful! newly created ResultViewer must not override other ResultViewers
+        # that may already be associated with the dataset viewer
+        my $result_viewer = AMGui::Wx::ResultViewer->new($self);
 
-            my $am = AMGui::AM->new;
-            $am->set_training($training)->set_testing($testing);
-            $am->set_result_viewer($result_viewer);
-            $am->classify_all; 
-        }
+        my $am = AMGui::AM->new;
+        $am->set_training($training)->set_testing($testing);
+        $am->set_result_viewer($result_viewer);
+        $am->classify_all; 
     }
 
+    return 1;
+}
+
+sub on_run_next_item {
+    my ($self, $event) = @_;
+
+    my $testing;
+    my $dv_testing; # DatasetViewer with the testing dataset
+    my $training;
+    my $curr_page = $self->notebook->get_current_page;
+    
+    if ( $curr_page and $curr_page->can('purpose') ) {
+        #warn "Purpose:" . $curr_page->purpose;
+        
+        if ( $curr_page->purpose eq 'results' ) {
+            $dv_testing = $curr_page->dataset_viewer;
+           
+        } elsif ( $curr_page->dataset->is_testing ) {
+            # given a testing dataset, use associated training dataset
+            $dv_testing = $curr_page;
+            
+        } elsif ( $curr_page->dataset->is_training ) {
+            $self->error("Please switch to a tab with a testing dataset.");
+            
+        } else {
+            # Dataset that was loaded alone.
+            # This dataset is used both as training and as testing (leave-one-out)
+            $dv_testing = $curr_page;
+        }
+    } else {
+        $self->inform("Please switch to a tab with a testing dataset and try again.");
+    }
+
+    if (defined $dv_testing
+        # Checking availability of training dataset to avoid advancing to the next item
+        # in the situation that classification will turn out impossible.
+        && $self->is_valid_dataset($dv_testing->training, MSG_TRAINING_NOT_FOUND))
+    {
+        #warn "Testing:  " . $testing;
+        #warn "Training: " . $training;
+        #warn "DatasetViewer for testing: " . $dv_testing;
+
+        if ( $dv_testing->advance_selection ) {
+            $self->classify_item($dv_testing);
+        } else {
+            $self->inform("No more exemplars available.");
+        }
+    }
+    
     return 1;
 }
 
@@ -421,7 +476,7 @@ sub is_valid_dataset {
         # ok
     } else {
         $status = FALSE;
-        $self->show_error($msg);
+        $self->error($msg);
     }
     return $status;
 }
@@ -439,13 +494,13 @@ sub update_aui {
 
 sub inform {
     my ($self, $msg) = @_;
-    Wx::MessageBox($msg, "Informing that", Wx::wxOK);
+    Wx::MessageBox(_T($msg), "Informing that", Wx::wxOK);
     return 1;
 }
 
-sub show_error {
+sub error {
     my ($self, $msg) = @_;
-    Wx::MessageBox($msg, "Error", Wx::wxOK|Wx::wxICON_ERROR);
+    Wx::MessageBox(_T($msg), "Error", Wx::wxOK|Wx::wxICON_ERROR);
     return 1;
    
 }
