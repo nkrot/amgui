@@ -63,20 +63,20 @@ sub close {
 #    return $self->{dataset};
 #}
 
-#sub set_classifier {
-#   my ($self, $classifier) = @_;
-#   $self->{classifier} = $classifier;
-#}
-
 sub on_double_click_item {
     my ($self, $event) = @_;
-    
-    my $item_idx = $self->GetSelection();
-    my $item = $self->dataset->nth_item($item_idx);
+    $self->main->classify_item($self);
+    $event->Skip;
+}
 
-    my $training = $self->dataset->training->data; #=> AM::DataSet
-    
-    $self->classifier->set_training($training)->classify($item);
+sub current_item {
+    my $self = shift;
+    return $self->dataset->nth_item( $self->GetSelection );
+}
+
+sub training_data {
+    my $self = shift;
+    return $self->dataset->training->data; #=> AM::DataSet
 }
 
 1;
