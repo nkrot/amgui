@@ -18,10 +18,10 @@ use Class::XSAccessor {
 };
 
 sub new {
-    my ($class, $parent, $main) = @_;
+    my ($class, $main) = @_;
     
     my $self = $class->SUPER::new (
-        $parent, 
+        $main->notebook, 
         Wx::wxID_ANY, 
         Wx::wxDefaultPosition, 
         Wx::wxDefaultSize, 
@@ -32,12 +32,12 @@ sub new {
 
     $self->Hide;
 
-    $self->{main} = defined $main ? $main : $parent->main;
+    $self->{main} = $main;
     
     $self->{results} = AMGui::Results->new;
     $self->{title} = "Result";
 
-    $self->{notebook} = $parent;
+    $self->{notebook} = $main->notebook;
     $self->{visible} = FALSE;
     
     $self->{statusbar_message} = '';
