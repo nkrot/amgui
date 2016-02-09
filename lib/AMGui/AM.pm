@@ -10,10 +10,10 @@ use AMGui::Results;
 use Class::XSAccessor {
     getters => {
         classifier    => 'classifier',
-        training      => 'training',      # training dataset
-        testing       => 'testing',       # testing dataset
-        result        => 'result',        # last result
-        result_viewer => 'result_viewer'  # many results
+        training      => 'training',      # training dataset, AM::DataSet
+        testing       => 'testing',       # testing dataset, AM::DataSet
+        result        => 'result',        # last result, AM::Result
+        result_viewer => 'result_viewer'  # many results, AMGui::Results
     },
     setters => {
         set_result_viewer => 'result_viewer'
