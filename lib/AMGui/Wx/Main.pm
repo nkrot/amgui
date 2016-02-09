@@ -256,8 +256,8 @@ sub on_run_batch {
         
         if ( $curr_page->purpose eq 'results' ) {
             # TODO: reach associated training dataset and use reuse it entirely?
-            # TODO: warn that current tab will be creared?
-            $self->inform("NOT IMPLEMENTED:\n This is the result tab. Switch to a dataset tab");
+            # TODO: warn that current tab will be cleared?
+            $self->inform("This is the result tab. Please switch to a dataset tab");
             #$curr_page->classifier
            
         } elsif ( $curr_page->dataset->is_testing ) {
@@ -266,18 +266,20 @@ sub on_run_batch {
             $training = $testing->training;
             
         } elsif ( $curr_page->dataset->is_training ) {
-            $self->inform("NOT IMPLEMENTED.\nPlease switch to a tab with a testing dataset");
+            $self->inform("Please switch to a tab with a testing dataset");
             
         } else {
             $training = $curr_page->dataset;
             $testing  = $training;
         }
     } else {
-        $self->inform("NOT IMPLEMENTED.\nPlease switch to a tab with a testing dataset");
+        $self->inform("Please switch to a tab with a testing dataset and try again");
     }
 
     if ( defined $testing ) {
-        # TODO: recycle existing result viewer
+        # TODO: recycle existing result viewer?
+        # be careful! newly created ResultViewer must not override other ResultViewers
+        # that may already be associated with the dataset viewer
         my $result_viewer = AMGui::Wx::ResultViewer->new($self);
 
         my $am = AMGui::AM->new;
