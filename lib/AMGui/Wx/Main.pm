@@ -289,6 +289,31 @@ sub on_run_batch {
     return 1;
 }
 
+sub classify_item {
+    my ($self, $dataset_viewer) = @_;
+    
+    # get data item highlighted in the current DatasetViewer
+    my $test_item = $dataset_viewer->current_item;  #=> AM::DataSet::Item
+    # reach training dataset associated with the dataset loaded in the current DatasetViewer
+    my $training  = $dataset_viewer->training_data; #=> AM::DataSet
+
+    # we want any new item from the current DatasetViewer to be outputted into
+    # the same ResultViewer upon classification. If DatasetViewer already has
+    # a ResultViewer associated with it, the latter will be reused. Otherwise
+    # we create one and associate it with DatasetViewer.
+    unless (defined $dataset_viewer->result_viewer) {
+        $dataset_viewer->set_result_viewer( AMGui::Wx::ResultViewer->new($self) );
+    }
+    
+    # finally, create a classifier and run it
+    my $am = AMGui::AM->new;
+    $am->set_training($training); #TODO: ->set_testing($test_item);
+    $am->set_result_viewer($dataset_viewer->result_viewer);
+    $am->classify($test_item);
+    
+    return 1;
+}
+
 sub on_next_tab {
     my ($self, $event) = @_;
     $self->notebook->select_next_tab;
