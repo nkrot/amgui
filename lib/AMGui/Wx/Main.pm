@@ -245,12 +245,10 @@ sub on_file_quit {
     $self->Close(1);
 }
 
-# TODO: refactor a la on_run_next_item?
 sub on_run_batch {
     my ($self, $event) = @_;
 
-    my $testing;
-    my $training;
+    my $dv_testing; # DatasetViewer with the testing dataset
     my $curr_page = $self->notebook->get_current_page;
 
     if ( $curr_page and $curr_page->can('purpose') ) {
@@ -259,8 +257,8 @@ sub on_run_batch {
         if ( $curr_page->purpose eq 'results' ) {
             if (defined $curr_page->dataset_viewer) {
                 # this Results tab was produced by classify_item method
-                $testing  = $curr_page->dataset_viewer->dataset;
-                $training = $testing->training;
+                $dv_testing = $curr_page->dataset_viewer;
+                
             } else {
                 # this Results tab was produced by on_run_batch method
                 $self->error("This is the result tab. Please switch to a dataset tab.");
@@ -268,8 +266,7 @@ sub on_run_batch {
 
         } elsif ( $curr_page->dataset->is_testing ) {
             # given a testing dataset, use associated training dataset
-            $testing  = $curr_page->dataset;
-            $training = $testing->training;
+            $dv_testing = $curr_page;
 
         } elsif ( $curr_page->dataset->is_training ) {
             $self->error("Please switch to a tab with a testing dataset.");
@@ -277,21 +274,24 @@ sub on_run_batch {
         } else {
             # Dataset that was loaded alone.
             # This dataset is used both as training and as testing (leave-one-out)
-            $training = $curr_page->dataset;
-            $testing  = $training;
+            $dv_testing = $curr_page;
         }
     } else {
         $self->inform("Please switch to a tab with a testing dataset and try again.");
     }
 
-    if ( defined $testing && $self->is_valid_dataset($training, MSG_TRAINING_NOT_FOUND) ) {
+    if (defined $dv_testing
+        # Checking availability of training dataset to avoid advancing to the next item
+        # in the situation that classification will turn out impossible.
+        && $self->is_valid_dataset($dv_testing->training, MSG_TRAINING_NOT_FOUND))
+    {
         # TODO: recycle existing result viewer?
         # be careful! newly created ResultViewer must not override other ResultViewers
         # that may already be associated with the dataset viewer
         my $result_viewer = AMGui::Wx::ResultViewer->new($self);
 
         my $am = AMGui::AM->new;
-        $am->set_training($training)->set_testing($testing);
+        $am->set_training($dv_testing->training)->set_testing($dv_testing->dataset);
         $am->set_result_viewer($result_viewer);
         $am->classify_all;
     }
@@ -302,9 +302,7 @@ sub on_run_batch {
 sub on_run_next_item {
     my ($self, $event) = @_;
 
-    my $testing;
     my $dv_testing; # DatasetViewer with the testing dataset
-    my $training;
     my $curr_page = $self->notebook->get_current_page;
 
     if ( $curr_page and $curr_page->can('purpose') ) {
