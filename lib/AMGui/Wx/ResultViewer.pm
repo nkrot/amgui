@@ -21,7 +21,7 @@ use Class::XSAccessor {
 sub new {
     my ($class, $main) = @_;
 
-    my $self = $class->SUPER::new (
+    my $self = $class->SUPER::new(
         $main->notebook,
         Wx::wxID_ANY,
         Wx::wxDefaultPosition,
