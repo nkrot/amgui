@@ -350,7 +350,7 @@ sub classify_item {
     my ($self, $dataset_viewer) = @_;
 
     # get data item highlighted in the current DatasetViewer
-    my $test_item = $dataset_viewer->current_item;  #=> AM::DataSet::Item
+    my $test_item = $dataset_viewer->current_data_item;  #=> AM::DataSet::Item
     # reach training dataset associated with the dataset loaded in the current DatasetViewer
     my $training  = $dataset_viewer->training; #=> AMGui::DataSet
 
