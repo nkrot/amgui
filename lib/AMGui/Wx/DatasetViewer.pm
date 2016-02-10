@@ -4,9 +4,11 @@ use strict;
 use warnings;
 
 use Wx qw[:everything];
+use Wx::Locale gettext => '_T';
+
 use AMGui::Constant;
 
-our @ISA = 'Wx::ListBox';
+our @ISA = 'Wx::ListView';
 
 use Class::XSAccessor {
     getters => {
@@ -27,8 +29,7 @@ sub new {
         wxID_ANY,
         wxDefaultPosition,
         wxDefaultSize,
-        $dataset->items_as_strings,
-        wxLB_SINGLE
+        wxLC_REPORT|wxLC_SINGLE_SEL|wxLC_HRULES|wxLC_VRULES
     );
     bless $self, $class;
 
@@ -37,10 +38,30 @@ sub new {
     $self->{title}         = $dataset->filename;
     $self->{result_viewer} = undef;
 
-    $main->notebook->AddPage($self, $self->{title}, 1);
-    $self->Deselect(0);
+    # Build the list, make it look like a spreadsheet
+    $self->InsertColumn(0, _T("Index"),    wxLIST_FORMAT_LEFT, wxLIST_AUTOSIZE_USEHEADER);
+    $self->InsertColumn(1, _T("Class"),    wxLIST_FORMAT_LEFT, wxLIST_AUTOSIZE_USEHEADER);
+    $self->InsertColumn(2, _T("Features"), wxLIST_FORMAT_LEFT, wxLIST_AUTOSIZE_USEHEADER);
+    $self->InsertColumn(3, _T("Comment"),  wxLIST_FORMAT_LEFT, wxLIST_AUTOSIZE_USEHEADER);
+    
+    # Populate the list with items from the dataset
+    for (my $i=0; $i < $self->dataset->size; $i++) {
+        my $data_item = $self->dataset->nth_item($i); # AM::DataSet::Item
+        
+        my $idx = $self->InsertStringItem($i, $i);
+        $self->SetItemData($idx, $i); # position of this item in AM::DataSet
+        $self->SetItem($idx, 1, $data_item->class);
+        $self->SetItem($idx, 2, join(" ", @{$data_item->features})); # TODO: do it somewhere else?
+        $self->SetItem($idx, 3, $data_item->comment);
+    }
+    for (my $i; $i < $self->GetColumnCount; $i++) {
+        $self->SetColumnWidth($i, wxLIST_AUTOSIZE);
+    }
 
-    Wx::Event::EVT_LISTBOX_DCLICK($self, $self->GetId, \&on_double_click_item);
+    $main->notebook->AddPage($self, $self->{title}, 1);
+    $self->Select(0, FALSE); # ensure nothing selected
+
+    Wx::Event::EVT_LIST_ITEM_ACTIVATED($self, $self->GetId, \&on_double_click_item);
 
     return $self;
 }
@@ -84,36 +105,33 @@ sub unset_result_viewer {
 
 sub on_double_click_item {
     my ($self, $event) = @_;
+    #$event->GetItem->GetData; #=> position of clicked item in AM::DataSet
     $self->main->classify_item($self);
     $event->Skip;
 }
 
-sub current_item {
+sub current_data_item {
     my $self = shift;
-    return $self->dataset->nth_item( $self->GetSelection );
+    return $self->dataset->nth_item( $self->GetFirstSelected );
 }
 
 sub advance_selection {
     my $self = shift;
 
-    my $curr_idx = $self->GetSelection;
+    my $curr_idx = $self->GetFirstSelected; # also GetFocused?
     my $next_idx;
 
-    if ( $curr_idx == Wx::wxNOT_FOUND ) {
+    if ( $curr_idx == -1 ) {
         $next_idx = 0;
-    } elsif ($curr_idx+1 == $self->GetCount) {
+    } elsif ($curr_idx+1 == $self->GetItemCount) {
         # looking at the last item, keep it selected
     } else {
-        ##$self->Deselect($curr_idx); # applies to wxLDB_MULTIPLE
         $next_idx = $curr_idx+1;
     }
 
     if (defined $next_idx) {
-        # TODO: this should also set the focus to the current item but
-        # it does not. The effect is that pressing UpArrow or DownArrow
-        # does not select the items around the highlighted one but
-        # around a focused one, which is one somewhere among previous items
-        $self->SetSelection($next_idx);
+        $self->Select($next_idx, TRUE); # this also deselects previous item
+        $self->Focus($next_idx);
     }
 
     return defined $next_idx;
