@@ -20,6 +20,9 @@ sub new {
     $self->Append(wxID_OPEN_PROJECT,  _T("O&pen a Project\tCtrl+Shift+O"), "");
     $self->Append(Wx::wxID_CLOSE,     _T("Close\tCtrl+W"), "");
     $self->AppendSeparator();
+    $self->Append(Wx::wxID_SAVE,      _T("&Save\tCtrl+S"), "");
+    $self->Append(Wx::wxID_SAVEAS,    _T("Save &As...\tCtrl+Shift+S"), "");
+    $self->AppendSeparator();
     $self->Append(Wx::wxID_EXIT,      _T("&Quit\tCtrl+Q"), "");
 
     return $self;

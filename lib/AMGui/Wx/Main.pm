@@ -71,6 +71,8 @@ sub new {
     Wx::Event::EVT_MENU($self, wxID_OPEN,          \&on_file_open);
     Wx::Event::EVT_MENU($self, wxID_OPEN_PROJECT,  \&on_file_open_project);
     Wx::Event::EVT_MENU($self, wxID_CLOSE,         \&on_file_close);
+    Wx::Event::EVT_MENU($self, wxID_SAVE,          \&on_file_save);
+    Wx::Event::EVT_MENU($self, wxID_SAVEAS,        \&on_file_save_as);
     Wx::Event::EVT_MENU($self, wxID_EXIT,          \&on_file_quit);
     Wx::Event::EVT_MENU($self, wxID_RUN_NEXT,      \&on_run_next_item);
     Wx::Event::EVT_MENU($self, wxID_RUN_BATCH,     \&on_run_batch);
@@ -233,6 +235,18 @@ sub on_file_open_project {
     return 1;
 }
 
+sub on_file_save {
+    my ($self, $event) = @_;
+    $self->inform("saving under the same name");
+    # if no associated name exists, open the dialog for choosing a name
+    $event->Skip;
+}
+
+sub on_file_save_as {
+    my ($self, $event) = @_;
+    $self->inform("saving under a new name");
+    $event->Skip;
+}
 
 # TODO: check if has unsaved modifications and do something about it
 sub on_file_close {
