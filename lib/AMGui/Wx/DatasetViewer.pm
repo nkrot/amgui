@@ -169,4 +169,22 @@ sub best_column_width {
 
     return $width;
 }
+
+# full path to the associated file
+sub path {
+    my $self = shift;
+    return $self->dataset->path;
+}
+
+sub set_path {
+    my ($self, $path) = @_;
+    $self->dataset->set_path($path);
+    return $self;
+}
+
+sub save {
+    my $self = shift;
+    return $self->dataset->save;
+}
+
 1;
