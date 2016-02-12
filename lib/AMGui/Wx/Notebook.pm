@@ -9,6 +9,7 @@ use Wx::Locale gettext => '_T';
 
 use AMGui::Wx              ();
 use AMGui::Wx::AuiManager  ();
+use AMGui::Wx::Viewer;
 
 our $VERSION = '1.00';
 our @ISA     = qw{
@@ -39,7 +40,7 @@ sub new {
 
     my $aui = $main->aui;
 
-    my @help = (
+    my $help = [
         "== USAGE ==",
         "1. Open a file in 'commas' format. File/Open or Ctrl-O",
         "   Once it is loaded, double click an item. It will be classified and results will appear in another tab",
@@ -55,8 +56,11 @@ sub new {
         "   c) all other cases are not yet processed",
         "4. When on a Result tab, pressing Ctrl-R runs the classification on the *next after highlighted* item in",
         "   the associated Testing dataset and displays classification results in the Results tab.",
-        "   The same when on Testing dataset tab."
-    );
+        "   The same when on Testing dataset tab.",
+        "5. Saving:",
+        "   - TODO: Pressing Ctrl+S saves current tab data to the filename associated with the tab",
+        "   + Pressing Ctrl+Shift+S saves asks the user for a filename and saves the current tab to that filename", 
+    ];
 
     my $self = $class->SUPER::new(
         $main,
@@ -82,10 +86,13 @@ sub new {
             Floatable      => 1,
             Dockable       => 1,
             Layer          => 1,
-            )->Center,
+        )->Center,
     );
 
     $aui->caption('notebook' => _T('Hello'), );
+
+    $self->{help} = AMGui::Wx::Viewer->new($self)->set_lines($help);
+    $self->create_tab($self->{help}, _T("Usage"));
 
     Wx::Event::EVT_AUINOTEBOOK_PAGE_CHANGED(
         $self, $self,
@@ -113,17 +120,6 @@ sub new {
 #    Wx::Event::EVT_AUINOTEBOOK_END_DRAG(
 #        $self, $self,
 #        sub { shift->on_auinotebook_end_drag(@_)}, );
-
-    $self->{help} = Wx::ListBox->new(
-        $self,
-        wxID_ANY,
-        wxDefaultPosition,
-        wxDefaultSize,
-        \@help,
-        wxLB_SINGLE
-    );
-
-    $self->create_tab($self->{help}, _T("Usage"));
 
     $main->update_aui;
 
