@@ -251,7 +251,7 @@ sub on_file_save_as {
     $event->Skip;
 
     my $page = $self->notebook->get_current_page or return;
-    
+
     # Guess directory to save to
     my $cwd = $self->cwd;
     if ( $page->can('path') && defined $page->path ) {
@@ -259,10 +259,10 @@ sub on_file_save_as {
     }
     # suggested filename to save to
     my $filename = 'outcome';
-    
+
     # TODO: add CSV and other formats
     my $wildcard = _T('All Files') . ( AMGui::Constant::WIN32 ? '|*.*' : '|*' );
-    
+
     my $dialog = Wx::FileDialog->new(
         $self,
         _T('Save file as...'),
@@ -275,12 +275,12 @@ sub on_file_save_as {
 	if ( $dialog->ShowModal == Wx::wxID_CANCEL ) {
 		return;
 	}
-    
+
     # Q: what if the user pasted the path to the file? - GetPath has it
     # Q: what if the user pasted the directory name? - Dialog handles it correctly
     #$cwd  = $dialog->GetDirectory; # dirname
     my $path = $dialog->GetPath;   # fullpath with the filename
-    
+
     return $page->set_path($path)->save;
 }
 
@@ -307,33 +307,35 @@ sub on_run_batch {
     my $dv_testing; # DatasetViewer with the testing dataset
     my $curr_page = $self->notebook->get_current_page;
 
-    if ( $curr_page and $curr_page->can('purpose') ) {
-        #warn "Purpose:" . $curr_page->purpose;
+    return 0 unless $curr_page;
 
-        if ( $curr_page->purpose && $curr_page->purpose eq 'results' ) {
-            if (defined $curr_page->dataset_viewer) {
-                # this Results tab was produced by classify_item method
-                $dv_testing = $curr_page->dataset_viewer;
-                
-            } else {
-                # this Results tab was produced by on_run_batch method
-                $self->error("This is the result tab. Please switch to a dataset tab.");
-            }
+    #warn "Purpose:" . $curr_page->purpose;
 
-        } elsif ( $curr_page->dataset->is_testing ) {
-            # given a testing dataset, use associated training dataset
-            $dv_testing = $curr_page;
+    if ( $curr_page->purpose eq AMGui::Wx::Viewer::GENERAL ) {
+        # ignore this page
+        $self->inform("Please switch to a tab with a testing dataset and try again.");
 
-        } elsif ( $curr_page->dataset->is_training ) {
-            $self->error("Please switch to a tab with a testing dataset.");
+    } elsif ( $curr_page->purpose eq AMGui::Wx::Viewer::RESULTS ) {
+        if (defined $curr_page->dataset_viewer) {
+            # this Results tab was produced by classify_item method
+            $dv_testing = $curr_page->dataset_viewer;
 
         } else {
-            # Dataset that was loaded alone.
-            # This dataset is used both as training and as testing (leave-one-out)
-            $dv_testing = $curr_page;
+            # this Results tab was produced by on_run_batch method
+            $self->error("This is the result tab. Please switch to a dataset tab.");
         }
-    } else {
-        $self->inform("Please switch to a tab with a testing dataset and try again.");
+
+    } elsif ( $curr_page->dataset->is_testing ) {
+        # given a testing dataset, use associated training dataset
+        $dv_testing = $curr_page;
+
+    } elsif ( $curr_page->dataset->is_training ) {
+        $self->error("Please switch to a tab with a testing dataset.");
+
+     } else {
+        # Dataset that was loaded alone.
+        # This dataset is used both as training and as testing (leave-one-out)
+        $dv_testing = $curr_page;
     }
 
     if (defined $dv_testing
@@ -361,26 +363,28 @@ sub on_run_next_item {
     my $dv_testing; # DatasetViewer with the testing dataset
     my $curr_page = $self->notebook->get_current_page;
 
-    if ( $curr_page and $curr_page->can('purpose') ) {
-        #warn "Purpose:" . $curr_page->purpose;
+    return 0 unless $curr_page;
 
-        if ( $curr_page->purpose eq 'results' ) {
-            $dv_testing = $curr_page->dataset_viewer;
+    #warn "Purpose:" . $curr_page->purpose;
 
-        } elsif ( $curr_page->dataset->is_testing ) {
-            # given a testing dataset, use associated training dataset
-            $dv_testing = $curr_page;
-
-        } elsif ( $curr_page->dataset->is_training ) {
-            $self->error("Please switch to a tab with a testing dataset.");
-
-        } else {
-            # Dataset that was loaded alone.
-            # This dataset is used both as training and as testing (leave-one-out)
-            $dv_testing = $curr_page;
-        }
-    } else {
+    if ( $curr_page->purpose eq AMGui::Wx::Viewer::GENERAL ) {
+        # ignore this page
         $self->inform("Please switch to a tab with a testing dataset and try again.");
+
+    } elsif ( $curr_page->purpose eq AMGui::Wx::Viewer::RESULTS ) {
+        $dv_testing = $curr_page->dataset_viewer;
+
+    } elsif ( $curr_page->dataset->is_testing ) {
+        # given a testing dataset, use associated training dataset
+        $dv_testing = $curr_page;
+
+    } elsif ( $curr_page->dataset->is_training ) {
+        $self->error("Please switch to a tab with a testing dataset.");
+
+    } else {
+        # Dataset that was loaded alone.
+        # This dataset is used both as training and as testing (leave-one-out)
+        $dv_testing = $curr_page;
     }
 
     if (defined $dv_testing
