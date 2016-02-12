@@ -239,22 +239,25 @@ sub on_file_open_project {
 sub on_file_save {
     my ($self, $event) = @_;
 
-    $event->Skip;
-
-    $self->inform("saving under the same name");
-    # if no associated name exists, open the dialog for choosing a name
+    my $page = $self->notebook->get_current_page;
+    if ( defined $page->path ) {
+        # TODO: if underlying file changed since it was opened, warn?
+        $page->save;
+    } else {
+        $self->on_file_save_as;
+    }
+    
+    return 1;
 }
 
 sub on_file_save_as {
     my ($self, $event) = @_;
 
-    $event->Skip;
-
     my $page = $self->notebook->get_current_page or return;
 
     # Guess directory to save to
     my $cwd = $self->cwd;
-    if ( $page->can('path') && defined $page->path ) {
+    if ( defined $page->path ) {
         $cwd = File::Basename::dirname($page->path);
     }
     # suggested filename to save to
