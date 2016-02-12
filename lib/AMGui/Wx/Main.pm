@@ -49,7 +49,7 @@ sub new {
     #$self->{window_1} = Wx::SplitterWindow->new($self, wxID_ANY);
     #$self->{grid_1} = Wx::Grid->new($self->{window_1}, wxID_ANY);
 
-    $self->SetTitle(_T("AM Gui"));
+    $self->SetTitle(_T("Analogical Modeling"));
     $self->SetSize(Wx::Size->new(900, 700));
 
     #$self->{grid_1}->CreateGrid(10, 3);
@@ -126,7 +126,7 @@ sub on_file_open {
         _T('Text Files'), '*.txt;*.TXT'
     );
 
-    my $fileDlg = Wx::FileDialog->new(
+    my $dialog = Wx::FileDialog->new(
         $self,
         _T('Open Files'),
         $self->cwd,    # Default directory
@@ -136,10 +136,10 @@ sub on_file_open {
     );
 
     # If the user really selected a file
-    if ($fileDlg->ShowModal == wxID_OK)
+    if ($dialog->ShowModal == wxID_OK)
     {
-        my @filenames = $fileDlg->GetFilenames;
-        $self->{cwd} = $fileDlg->GetDirectory;
+        my @filenames = $dialog->GetFilenames;
+        $self->{cwd} = $dialog->GetDirectory;
 
         my @files;
         foreach my $filename (@filenames) {
@@ -177,7 +177,7 @@ sub on_file_open_project {
         _T('All Files'),     ( AMGui::Constant::WIN32 ? '*.*' : '*' )
      );
 
-    my $file_dlg = Wx::FileDialog->new(
+    my $dialog = Wx::FileDialog->new(
         $self,
         _T('Open Training and Testing datasets at once'),
         $self->cwd,    # Default directory
@@ -187,10 +187,10 @@ sub on_file_open_project {
     );
 
     # If the user really selected a file
-    if ($file_dlg->ShowModal == wxID_OK)
+    if ($dialog->ShowModal == wxID_OK)
     {
-        my @filenames = $file_dlg->GetFilenames;
-        $self->{cwd} = $file_dlg->GetDirectory;
+        my @filenames = $dialog->GetFilenames;
+        $self->{cwd}  = $dialog->GetDirectory;
 
         # TODO: check that there are exactly two files
         # and swear otherwise
