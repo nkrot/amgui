@@ -16,11 +16,12 @@ use Class::XSAccessor {
         training => 'training'   # associated training dataset
     },
     setters => {
-        'set_purpose'  => 'purpose',
-        'set_training' => 'training'
+        set_purpose  => 'purpose',
+        set_training => 'training'
     }
 };
 
+# TODO: move into Viewer component
 use constant TRAINING => 'training';
 use constant TESTING  => 'testing';
 
@@ -119,7 +120,7 @@ sub set_path {
 sub save {
     my ($self, $format) = @_;
     $format = $self->format  unless defined $format;
-    
+
     warn "Saving to " . $self->path . " in " . $format . " format ";
     return 1;
 }
