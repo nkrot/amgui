@@ -18,7 +18,8 @@ use Class::XSAccessor {
     getters => {
         eol       => 'eol',
         path      => 'path',
-        purpose   => 'purpose'
+        purpose   => 'purpose',
+        filename  => 'filename'
     },
     setters => {
         set_eol     => 'eol',
@@ -41,8 +42,9 @@ sub new {
     );
     bless $self, $class;
     
-    $self->{path} = undef;
-    $self->{eol}  = "\n"; # TODO: need something smarter
+    $self->{eol}      = "\n"; # TODO: need something smarter
+    $self->{path}     = undef;
+    $self->{filename} = undef;
 
     $self->{purpose} = GENERAL;
     
