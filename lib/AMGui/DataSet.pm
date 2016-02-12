@@ -35,9 +35,10 @@ sub new {
     }
 
     $self->{data}     = Algorithm::AM::DataSet::dataset_from_file(%args);
-    $self->{filename} = ( File::Spec->splitpath( $self->path ) )[-1];
     $self->{purpose}  = undef ; # TRAINING or TESTING
     $self->{training} = $self;
+
+    $self->set_path( $self->path ); # this sets both path and filename
 
     return $self;
 }
@@ -107,6 +108,21 @@ sub item_as_string {
 #    my ($self) = shift;
 #    return $self->path;
 #}
+
+sub set_path {
+    my ($self, $path) = @_;
+    $self->{path}     = $path;
+    $self->{filename} = ( File::Spec->splitpath( $path ) )[-1];
+    return 1;
+}
+
+sub save {
+    my ($self, $format) = @_;
+    $format = $self->format  unless defined $format;
+    
+    warn "Saving to " . $self->path . " in " . $format . " format ";
+    return 1;
+}
 
 1;
 
