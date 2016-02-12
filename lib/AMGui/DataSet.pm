@@ -67,6 +67,11 @@ sub size {
     return $self->{data}->size;
 }
 
+sub cardinality {
+    my $self = shift;
+    return $self->{data}->cardinality;
+}
+
 sub items_as_strings {
     my $self = shift;
     my @lines = map { $self->nth_item_as_string($_) } 0..$self->size-1;
