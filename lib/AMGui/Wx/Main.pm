@@ -254,7 +254,7 @@ sub on_run_batch {
     if ( $curr_page and $curr_page->can('purpose') ) {
         #warn "Purpose:" . $curr_page->purpose;
 
-        if ( $curr_page->purpose eq 'results' ) {
+        if ( $curr_page->purpose && $curr_page->purpose eq 'results' ) {
             if (defined $curr_page->dataset_viewer) {
                 # this Results tab was produced by classify_item method
                 $dv_testing = $curr_page->dataset_viewer;
