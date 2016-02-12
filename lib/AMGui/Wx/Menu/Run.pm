@@ -16,8 +16,8 @@ sub new {
     my $self = $class->SUPER::new(@_);
     bless $self, $class;
 
-    $self->Append(wxID_RUN_NEXT,   _T("&Run AM on the next item\tCtrl+R"), "");
-    $self->Append(wxID_RUN_BATCH,  _T("&Run AM on all items in the current dataset\tCtrl+Shift+R"), "");
+    $self->Append(wxID_RUN_NEXT,   _T("Run AM on the &next item\tCtrl+R"), "");
+    $self->Append(wxID_RUN_BATCH,  _T("Run AM on &all items in the current dataset\tCtrl+Shift+R"), "");
 
     return $self;
 }
