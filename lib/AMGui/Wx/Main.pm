@@ -6,6 +6,7 @@ use warnings;
 use Cwd ();
 use File::Slurp;
 use File::Spec;
+use File::Basename;
 
 use Wx qw[:everything];
 use Wx::Locale gettext => '_T';
@@ -237,14 +238,55 @@ sub on_file_open_project {
 
 sub on_file_save {
     my ($self, $event) = @_;
+
+    $event->Skip;
+
     $self->inform("saving under the same name");
     # if no associated name exists, open the dialog for choosing a name
-    $event->Skip;
 }
 
 sub on_file_save_as {
     my ($self, $event) = @_;
-    $self->inform("saving under a new name");
+
+    $event->Skip;
+
+    my $page = $self->notebook->get_current_page or return;
+    
+    # Guess directory to save to
+    my $cwd = $self->cwd;
+    if ( $page->can('path') && defined $page->path ) {
+        $cwd = File::Basename::dirname($page->path);
+    }
+    # suggested filename to save to
+    my $filename = 'outcome';
+    
+    # TODO: add CSV and other formats
+    my $wildcard = _T('All Files') . ( AMGui::Constant::WIN32 ? '|*.*' : '|*' );
+    
+    my $dialog = Wx::FileDialog->new(
+        $self,
+        _T('Save file as...'),
+		$cwd,          # open in this directory
+		$filename,     # suggested output file name
+		$wildcard,
+		Wx::wxFD_SAVE|Wx::wxFD_OVERWRITE_PROMPT
+	);
+
+	if ( $dialog->ShowModal == Wx::wxID_CANCEL ) {
+		return;
+	}
+    
+    # Q: what if the user pasted the path to the file? - GetPath has it
+    # Q: what if the user pasted the directory name? - Dialog handles it correctly
+    #$cwd  = $dialog->GetDirectory; # dirname
+    my $path = $dialog->GetPath;   # fullpath with the filename
+    
+    return $page->set_path($path)->save;
+}
+
+sub on_file_save_all {
+    my ($self, $event) = @_;
+    $self->inform("Saving all files not implemented yet");
     $event->Skip;
 }
 
