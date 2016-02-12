@@ -2,6 +2,7 @@ package AMGui::Wx::DatasetViewer;
 
 use strict;
 use warnings;
+#use Data::Dumper;
 
 use Wx qw[:everything];
 use Wx::Locale gettext => '_T';
@@ -39,26 +40,36 @@ sub new {
     $self->{result_viewer} = undef;
 
     # Build the list, make it look like a spreadsheet
-    $self->InsertColumn(0, _T("Index"),    wxLIST_FORMAT_LEFT, wxLIST_AUTOSIZE_USEHEADER);
-    $self->InsertColumn(1, _T("Class"),    wxLIST_FORMAT_LEFT, wxLIST_AUTOSIZE_USEHEADER);
-    $self->InsertColumn(2, _T("Features"), wxLIST_FORMAT_LEFT, wxLIST_AUTOSIZE_USEHEADER);
-    $self->InsertColumn(3, _T("Comment"),  wxLIST_FORMAT_LEFT, wxLIST_AUTOSIZE_USEHEADER);
+    my ($col, $width) = (0, wxLIST_AUTOSIZE_USEHEADER);
+    # The table header
+    $self->InsertColumn($col++, _T("Index"), wxLIST_FORMAT_LEFT, $width);
+    $self->InsertColumn($col++, _T("Class"), wxLIST_FORMAT_LEFT, $width);
+    for (my $i=0; $i < $self->dataset->cardinality; $i++) {
+        # a separate column for every feature
+        $self->InsertColumn($col++, _T("F" . (1+$i)), wxLIST_FORMAT_LEFT, $width);
+    }
+    $self->InsertColumn($col++, _T("Comment"), wxLIST_FORMAT_LEFT, $width);
     
-    # Populate the list with items from the dataset
+    # Populate the table (rows) with items from the dataset
     for (my $i=0; $i < $self->dataset->size; $i++) {
         my $data_item = $self->dataset->nth_item($i); # AM::DataSet::Item
-        
+
         my $idx = $self->InsertStringItem($i, $i);
-        $self->SetItemData($idx, $i); # position of this item in AM::DataSet
-        $self->SetItem($idx, 1, $data_item->class);
-        $self->SetItem($idx, 2, join(" ", @{$data_item->features})); # TODO: do it somewhere else?
-        $self->SetItem($idx, 3, $data_item->comment);
+
+        # fill in the columns
+        $col = 1;
+        $self->SetItemData($idx, $i);                      # position of this item in AM::DataSet
+        $self->SetItem($idx, $col++, $data_item->class);   # expected class
+        foreach my $feature (@{$data_item->features}) {
+            $self->SetItem($idx, $col++, $feature);        # features, each in its own column
+        }
+        $self->SetItem($idx, $col++, $data_item->comment); # comment, often the word itself
     }
-    for (my $i; $i < $self->GetColumnCount; $i++) {
-        $self->SetColumnWidth($i, wxLIST_AUTOSIZE);
+    for (my $i=0; $i < $self->GetColumnCount; $i++) {
+        $self->SetColumnWidth($i, $self->best_column_width($i));
     }
 
-    $main->notebook->AddPage($self, $self->{title}, 1);
+    $self->main->notebook->AddPage($self, $self->{title}, 1);
     $self->Select(0, FALSE); # ensure nothing selected
 
     Wx::Event::EVT_LIST_ITEM_ACTIVATED($self, $self->GetId, \&on_double_click_item);
@@ -81,7 +92,7 @@ sub close {
 sub set_result_viewer {
     my ($self, $viewer) = @_;
     $self->{result_viewer} = $viewer;
-    $viewer->set_dataset_viewer($self); # create a backlink ResultViewer->DatasetViewer
+    $viewer->set_dataset_viewer($self); # a backlink from ResultViewer to DatasetViewer
     return 1;
 }
 
@@ -142,4 +153,20 @@ sub training {
     return $self->dataset->training; #=> AMGui::DataSet
 }
 
+sub best_column_width {
+    my ($self, $col) = @_;
+
+    #my $width = wxLIST_AUTOSIZE_USEHEADER; # in a bugless world this whould be enough
+    my $width = wxLIST_AUTOSIZE;
+
+    # TODO: something wrong here, can not get to the text stored in a cell
+#    for (my $i=0; $i < $self->GetItemCount; $i++) {
+#        my $item = $self->GetItem($i);
+#        warn Dumper($item->GetColumn);
+#        #warn $cell->GetText;
+#        #warn join(",", $self->GetTextExtent($cell->GetText));
+#    }
+
+    return $width;
+}
 1;
