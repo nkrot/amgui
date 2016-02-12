@@ -58,8 +58,9 @@ sub new {
         "   the associated Testing dataset and displays classification results in the Results tab.",
         "   The same when on Testing dataset tab.",
         "5. Saving:",
-        "   - TODO: Pressing Ctrl+S saves current tab data to the filename associated with the tab",
-        "   + Pressing Ctrl+Shift+S saves asks the user for a filename and saves the current tab to that filename", 
+        "   + Pressing Ctrl+S saves current tab data to the filename associated with the tab",
+        "     + or to a new filename, if none is associated",
+        "   + Pressing Ctrl+Shift+S asks the user for a filename and saves the current tab to that filename", 
     ];
 
     my $self = $class->SUPER::new(
