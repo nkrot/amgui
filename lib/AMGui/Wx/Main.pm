@@ -133,7 +133,7 @@ sub on_file_open {
         $self->cwd,    # Default directory
         '',            # Default file
         $wildcard,
-        wxOPEN|wxFILE_MUST_EXIST
+        wxFD_OPEN|wxFD_FILE_MUST_EXIST
     );
 
     # If the user really selected a file
@@ -184,7 +184,7 @@ sub on_file_open_project {
         $self->cwd,    # Default directory
         '',            # Default file
         $wildcard,
-        wxOPEN|wxFILE_MUST_EXIST|wxFD_MULTIPLE
+        wxFD_OPEN|wxFD_FILE_MUST_EXIST|wxFD_MULTIPLE
     );
 
     # If the user really selected a file
@@ -246,7 +246,7 @@ sub on_file_save {
     } else {
         $self->on_file_save_as;
     }
-    
+
     return 1;
 }
 
@@ -269,15 +269,15 @@ sub on_file_save_as {
     my $dialog = Wx::FileDialog->new(
         $self,
         _T('Save file as...'),
-		$cwd,          # open in this directory
-		$filename,     # suggested output file name
-		$wildcard,
-		Wx::wxFD_SAVE|Wx::wxFD_OVERWRITE_PROMPT
-	);
+        $cwd,          # open in this directory
+        $filename,     # suggested output file name
+        $wildcard,
+        Wx::wxFD_SAVE|Wx::wxFD_OVERWRITE_PROMPT
+    );
 
-	if ( $dialog->ShowModal == Wx::wxID_CANCEL ) {
-		return;
-	}
+    if ( $dialog->ShowModal == Wx::wxID_CANCEL ) {
+        return;
+    }
 
     # Q: what if the user pasted the path to the file? - GetPath has it
     # Q: what if the user pasted the directory name? - Dialog handles it correctly
