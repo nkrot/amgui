@@ -28,13 +28,30 @@ sub add {
     return scalar @{ $self->{results} };
 }
 
+sub to_pct {
+    my ($self, $part, $whole) = @_;
+    my $percentage_format = '%.3f'; # also defined in Algorithm::AM::Result
+    return sprintf($percentage_format, 100 * $part / $whole);
+}
+
 sub as_strings {
     my ($self, $result) = @_;
     my $lines = [
-        "Tested item:\n" . $self->as_string($result->test_item),
-        "Predicted class(es): " . (join ",", @{ $result->winners }),
+        "Tested item:\n"        . $self->as_string($result->test_item),
+        "Predicted class(es): " . join(",", @{ $result->winners}),
+        ${$result->config_info},
         ${$result->statistical_summary}
     ];
+    
+    push @{$lines}, "Hoho! I can extract it!";
+    
+    my %scores = %{$result->scores};
+    for my $class (sort keys %scores) {
+        push @{$lines}, join("\t", $class,
+                                   %scores{$class},
+                                   $self->to_pct( $scores{$class}, $result->total_points ));
+    }
+    
     return $lines;
 }
 
