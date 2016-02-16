@@ -9,6 +9,7 @@ use Wx::Locale gettext => '_T';
 
 use AMGui::Constant;
 
+# TODO: no need to use it as a base class? use association instead
 our @ISA = 'Wx::ListView';
 
 use Class::XSAccessor {
