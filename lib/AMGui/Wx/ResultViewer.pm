@@ -5,6 +5,7 @@ use warnings;
 
 use AMGui::Constant;
 use AMGui::Results;
+use AMGui::Wx::Viewer;
 
 our @ISA = 'Wx::ListBox';
 
@@ -14,7 +15,8 @@ use Class::XSAccessor {
         notebook       => 'notebook',
         index          => 'index',
         results        => 'results', # AMGui::Result (collection)
-        dataset_viewer => 'dataset_viewer'
+        dataset_viewer => 'dataset_viewer',
+        purpose        => 'purpose'
     }
 };
 
@@ -37,6 +39,7 @@ sub new {
 
     $self->{results} = AMGui::Results->new;
     $self->{title} = "Result";
+    $self->{purpose} = AMGui::Wx::Viewer::RESULTS;
 
     $self->{notebook} = $main->notebook;
     $self->{visible} = FALSE;
@@ -173,8 +176,20 @@ sub set_classifier {
     $classifier->set_result_viewer( $self );
 }
 
-sub purpose {
-    return 'results';
+# TODO
+sub path {
+    warn "ResultViewer::path called";
+    return undef;
+}
+
+sub set_path {
+    my ($self, $path) = @_;
+    warn "ResultViewer::set_path called";
+    return $self;
+}
+
+sub save {
+    my $self = shift;
 }
 
 1;
