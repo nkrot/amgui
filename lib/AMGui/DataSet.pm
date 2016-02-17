@@ -58,8 +58,20 @@ sub is_testing {
 
 ######################################################################
 
+sub unpurpose {
+    my $self = shift;
+    $self->{purpose} = undef;
+}
+
 sub close {
     my $self = shift;
+	# if the current dataset is testing, when its holding tab is closed
+	# we unlink associated training dataset so that it becomes possible
+	# to use the latter as both training and testing, as if sole
+	# dataset was loaded originally
+    if ( $self->is_testing ) {
+        $self->training->unpurpose;
+    }
     $self->{data} = undef;
     return 1;
 }
