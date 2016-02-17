@@ -100,9 +100,9 @@ sub new {
         $self, $self,
         sub { shift->on_auinotebook_page_changed(@_); }, );
 
-    #Wx::Event::EVT_AUINOTEBOOK_PAGE_CLOSE(
-#        $main, $self,
-#        sub { shift->on_close_tab(@_); }, );
+    Wx::Event::EVT_AUINOTEBOOK_PAGE_CLOSE(
+        $self, $self,
+        sub { shift->on_auinotebook_page_close(@_) }, );
 
     # this event does not happen, thank you, AUINotebook developers
 #    Wx::Event::EVT_AUINOTEBOOK_DRAG_MOTION(
@@ -172,17 +172,30 @@ sub get_current_page {
 
 sub close_current_page {
     my $self = shift;
-
     my $id = $self->GetSelection;
-
     my $page = $self->GetPage($id);
-    $page->close  if $page and $page->can('close');
-
-    return $self->DeletePage($id);
+    $page->close  if $page;
+    return $self->DeletePage($id)
 }
+
+# issue close on objects associated with this page
+#sub close_page_data {
+#    my ($self, $id) = @_;
+#    my $page = $self->GetPage($id);
+#    $page->close;
+#    warn "Done";
+#    return 1;
+#}
 
 ######################################################################
 # event handlers
+
+sub on_auinotebook_page_close {
+    my ($self, $event) = @_;
+    my $page = $self->GetPage($event->GetSelection);
+    $page->close  if $page;
+    return 1;
+}
 
 sub on_auinotebook_page_changed {
     my ($self, $event) = @_;
