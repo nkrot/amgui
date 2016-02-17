@@ -22,7 +22,7 @@ use Class::XSAccessor {
         main    => 'main',
         menubar => 'menubar',
 
-	# individual menus
+        # individual menus
         file    => 'file',
         run     => 'run',
         window  => 'window',
@@ -32,23 +32,22 @@ use Class::XSAccessor {
 
 sub new {
     my ($class, $main) = @_;
-    
+
     my $self = bless {
-	main    => $main,
-	menubar => Wx::MenuBar->new
+        main    => $main,
+        menubar => Wx::MenuBar->new
     }, $class;
 
     $self->{file}   = AMGui::Wx::Menu::File->new($main);
     $self->{run}    = AMGui::Wx::Menu::Run->new($main);
     $self->{window} = AMGui::Wx::Menu::Window->new($main);
     $self->{help}   = AMGui::Wx::Menu::Help->new($main);
-    
-   
+
     $self->append($self->{file});
     $self->append($self->{run});
     $self->append($self->{window});
     $self->append($self->{help});
-    
+
     return $self;
 }
 
