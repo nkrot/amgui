@@ -14,18 +14,16 @@ use Class::XSAccessor {
 
 sub new {
     my $class = shift;
-
     my $self = bless {}, $class;
-
-    $self->{results} = ();
-
+    $self->{results} = [];
     return $self;
 }
 
 sub add {
     my ($self, $result) = @_;
+    my $count = scalar @{ $self->{results} };
     push @{ $self->{results} }, $result;
-    return scalar @{ $self->{results} };
+    return $count; # position of the newly added item
 }
 
 sub to_pct {
@@ -42,16 +40,16 @@ sub as_strings {
         ${$result->config_info},
         ${$result->statistical_summary}
     ];
-    
+
     push @{$lines}, "Hoho! I can extract it!";
-    
+
     my %scores = %{$result->scores};
     for my $class (sort keys %scores) {
         push @{$lines}, join("\t", $class,
                                    %scores{$class},
                                    $self->to_pct( $scores{$class}, $result->total_points ));
     }
-    
+
     return $lines;
 }
 
@@ -76,5 +74,4 @@ sub last_n {
 }
 
 1;
-
 
