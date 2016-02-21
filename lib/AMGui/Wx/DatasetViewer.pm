@@ -26,9 +26,7 @@ use Class::XSAccessor {
 sub new {
     my ($class, $main, $dataset) = @_;
 
-    my $self = $class->SUPER::new (
-        $main->notebook,
-    );
+    my $self = $class->SUPER::new($main->notebook);
     bless $self, $class;
 
     $self->{main}          = $main;
@@ -73,7 +71,7 @@ sub add_row {
     push @columns, @{$dataset_item->features}; # each feature in its column
     push @columns, $dataset_item->comment;     # comment, often word itself
 
-    return $self->SUPER::add_row(\@columns, $pos_in_dataset);
+    return $self->SUPER::add_row($pos_in_dataset, \@columns);
 }
 
 sub purpose {
