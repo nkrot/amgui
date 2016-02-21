@@ -37,22 +37,22 @@ sub new {
     $self->{result_viewer} = undef;
 
     # Create the table header: column names
-	my @columns = ("Index", "Class");
+    my @columns = ("Index", "Class");
     for (my $i=0; $i < $self->dataset->cardinality; $i++) {
-		push @columns, "F" . (1+$i); # a separate column for every feature
-	}
-	push @columns, "Comment";
+        push @columns, "F" . (1+$i); # a separate column for every feature
+    }
+    push @columns, "Comment";
 
-	$self->add_columns(\@columns);
+    $self->add_columns(\@columns);
 
     # Populate the table (rows) with items from the dataset
     for (my $i=0; $i < $self->dataset->size; $i++) {
         my $data_item = $self->dataset->nth_item($i); # AM::DataSet::Item
-		$self->add_row($i, $data_item);
+        $self->add_row($i, $data_item);
     }
 	$self->adjust_column_widths;
 
-	# show the table in a new notebook page
+    # show the table in a new notebook page
     $self->main->notebook->AddPage($self, $self->{title}, 1);
     $self->Select(0, FALSE); # ensure nothing selected
 
@@ -63,23 +63,17 @@ sub new {
 
 # Given a AM::DataSet::Item, lay it down in a row
 sub add_row {
-	my ($self, $pos_in_dataset, $dataset_item) = @_;
-	my ($row, $col) = ($self->GetItemCount, 0);
+    my ($self, $pos_in_dataset, $dataset_item) = @_;
 
-    $self->InsertStringItem($row, $pos_in_dataset);
+    my @columns = (
+        $pos_in_dataset,      # position of this item in AM::DataSet
+        $dataset_item->class  # expected class
+    );
 
-    # at col 0: position of this item in AM::DataSet
-	$self->SetItemData($row, $pos_in_dataset);
-    # at col 1: expected class
-	$self->SetItem($row, ++$col, $dataset_item->class);
-    # columns for each and every feature
-	foreach my $feature (@{$dataset_item->features}) {
-		$self->SetItem($row, ++$col, $feature);        
-	}
-    # at last col: comment
-	$self->SetItem($row, ++$col, $dataset_item->comment);
+    push @columns, @{$dataset_item->features}; # each feature in its column
+    push @columns, $dataset_item->comment;     # comment, often word itself
 
-	return $row;
+    return $self->SUPER::add_row(\@columns, $pos_in_dataset);
 }
 
 sub purpose {
