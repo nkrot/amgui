@@ -8,9 +8,9 @@ use Wx qw[:everything];
 use Wx::Locale gettext => '_T';
 
 use AMGui::Constant;
+use AMGui::Wx::TabularViewer;
 
-# TODO: no need to use it as a base class? use association instead
-our @ISA = 'Wx::ListView';
+our @ISA = 'AMGui::Wx::TabularViewer';
 
 use Class::XSAccessor {
     getters => {
@@ -28,10 +28,6 @@ sub new {
 
     my $self = $class->SUPER::new (
         $main->notebook,
-        wxID_ANY,
-        wxDefaultPosition,
-        wxDefaultSize,
-        wxLC_REPORT|wxLC_SINGLE_SEL|wxLC_HRULES|wxLC_VRULES
     );
     bless $self, $class;
 
@@ -40,42 +36,50 @@ sub new {
     $self->{title}         = $dataset->filename;
     $self->{result_viewer} = undef;
 
-    # Build the list, make it look like a spreadsheet
-    my ($col, $width) = (0, wxLIST_AUTOSIZE_USEHEADER);
-    # The table header
-    $self->InsertColumn($col++, _T("Index"), wxLIST_FORMAT_LEFT, $width);
-    $self->InsertColumn($col++, _T("Class"), wxLIST_FORMAT_LEFT, $width);
+    # Create the table header: column names
+	my @columns = ("Index", "Class");
     for (my $i=0; $i < $self->dataset->cardinality; $i++) {
-        # a separate column for every feature
-        $self->InsertColumn($col++, _T("F" . (1+$i)), wxLIST_FORMAT_LEFT, $width);
-    }
-    $self->InsertColumn($col++, _T("Comment"), wxLIST_FORMAT_LEFT, $width);
-    
+		push @columns, "F" . (1+$i); # a separate column for every feature
+	}
+	push @columns, "Comment";
+
+	$self->add_columns(\@columns);
+
     # Populate the table (rows) with items from the dataset
     for (my $i=0; $i < $self->dataset->size; $i++) {
         my $data_item = $self->dataset->nth_item($i); # AM::DataSet::Item
-
-        my $idx = $self->InsertStringItem($i, $i);
-
-        # fill in the columns
-        $col = 1;
-        $self->SetItemData($idx, $i);                      # position of this item in AM::DataSet
-        $self->SetItem($idx, $col++, $data_item->class);   # expected class
-        foreach my $feature (@{$data_item->features}) {
-            $self->SetItem($idx, $col++, $feature);        # features, each in its own column
-        }
-        $self->SetItem($idx, $col++, $data_item->comment); # comment, often the word itself
+		$self->add_row($i, $data_item);
     }
-    for (my $i=0; $i < $self->GetColumnCount; $i++) {
-        $self->SetColumnWidth($i, $self->best_column_width($i));
-    }
+	$self->adjust_column_widths;
 
+	# show the table in a new notebook page
     $self->main->notebook->AddPage($self, $self->{title}, 1);
     $self->Select(0, FALSE); # ensure nothing selected
 
     Wx::Event::EVT_LIST_ITEM_ACTIVATED($self, $self->GetId, \&on_double_click_item);
 
     return $self;
+}
+
+# Given a AM::DataSet::Item, lay it down in a row
+sub add_row {
+	my ($self, $pos_in_dataset, $dataset_item) = @_;
+	my ($row, $col) = ($self->GetItemCount, 0);
+
+    $self->InsertStringItem($row, $pos_in_dataset);
+
+    # at col 0: position of this item in AM::DataSet
+	$self->SetItemData($row, $pos_in_dataset);
+    # at col 1: expected class
+	$self->SetItem($row, ++$col, $dataset_item->class);
+    # columns for each and every feature
+	foreach my $feature (@{$dataset_item->features}) {
+		$self->SetItem($row, ++$col, $feature);        
+	}
+    # at last col: comment
+	$self->SetItem($row, ++$col, $dataset_item->comment);
+
+	return $row;
 }
 
 sub purpose {
@@ -154,22 +158,6 @@ sub training {
     return $self->dataset->training; #=> AMGui::DataSet
 }
 
-sub best_column_width {
-    my ($self, $col) = @_;
-
-    #my $width = wxLIST_AUTOSIZE_USEHEADER; # in a bugless world this whould be enough
-    my $width = wxLIST_AUTOSIZE;
-
-    # TODO: something wrong here, can not get to the text stored in a cell
-#    for (my $i=0; $i < $self->GetItemCount; $i++) {
-#        my $item = $self->GetItem($i);
-#        warn Dumper($item->GetColumn);
-#        #warn $cell->GetText;
-#        #warn join(",", $self->GetTextExtent($cell->GetText));
-#    }
-
-    return $width;
-}
 
 # full path to the associated file
 sub path {
