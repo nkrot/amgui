@@ -35,7 +35,7 @@ sub add_columns {
 }
 
 sub add_row {
-    my ($self, $columns, $str_item) = @_;
+    my ($self, $str_item, $columns) = @_;
     my $row = $self->GetItemCount;
 
     $self->InsertStringItem($row, $str_item);
