@@ -5,16 +5,17 @@ use warnings;
 
 use AMGui::Constant;
 use AMGui::Results;
+use AMGui::Wx::TabularViewer;
 use AMGui::Wx::Viewer;
 
-our @ISA = 'Wx::ListBox';
+our @ISA = 'AMGui::Wx::TabularViewer';
 
 use Class::XSAccessor {
     getters => {
         main           => 'main',
         notebook       => 'notebook',
         index          => 'index',
-        results        => 'results', # AMGui::Result (collection)
+        results        => 'results', # (list of) AMGui::Result
         dataset_viewer => 'dataset_viewer',
         purpose        => 'purpose'
     }
@@ -23,14 +24,7 @@ use Class::XSAccessor {
 sub new {
     my ($class, $main) = @_;
 
-    my $self = $class->SUPER::new(
-        $main->notebook,
-        Wx::wxID_ANY,
-        Wx::wxDefaultPosition,
-        Wx::wxDefaultSize,
-        [],
-        Wx::wxLB_SINGLE
-    );
+    my $self = $class->SUPER::new($main->notebook);
     bless $self, $class;
 
     $self->Hide;
@@ -38,11 +32,11 @@ sub new {
     $self->{main} = $main;
 
     $self->{results} = AMGui::Results->new;
-    $self->{title} = "Result";
+    $self->{title}   = "Result";
     $self->{purpose} = AMGui::Wx::Viewer::RESULTS;
 
     $self->{notebook} = $main->notebook;
-    $self->{visible} = FALSE;
+    $self->{visible}  = FALSE;
 
     $self->{statusbar_message} = '';
 
@@ -107,21 +101,22 @@ sub show_in_statusbar {
 
 # TODO: problem! when this method is called as a callback from classify_all
 # in order to display results as they are generated, the tab does not get updated
-# until the processing has finished. Statusbar however is updated succesfully!
+# until the processing has finished. Statusbar however is updated successfully!
 sub add {
     my ($self, $result) = @_;
-    $self->results->add( $result );
+    my $idx = $self->results->add( $result );
 
     $self->show(TRUE); # and switch to this very tab
 
-    my $count = $self->GetCount;
+    my $row = $self->add_row($idx, $result);
 
-    my $items = $self->results->as_strings( $result );
-    $self->InsertItems( $items, $count );
+##    my $count = $self->GetCount;
+##    my $items = $self->results->as_strings( $result );
+##    $self->InsertItems( $items, $count );
 
-    # focus the most recent result
-    $self->SetSelection($count); # highlight the first line of the added result
-    $self->SetFirstItem($count); # scrolls to the item
+    # Focus the most recent result
+    $self->Select($row, TRUE); # highlight the first line of the added result
+    $self->Focus($row);        # focuses and scrolls to the item
 
     #$self->main->update_aui;
     #$self->notebook->Update;
@@ -129,40 +124,40 @@ sub add {
     return $self;
 }
 
-# useless
-#sub add_lazily {
-#    my ($self, $result) = @_;
-#    $self->results->add( $result );
-#    $self->{notshown}++;
-#
-#    if ( $self->{notshown} >= 100 ) {
-#        $self->show_lazily_added;
-#    }
-#
-#    return 1;
-#}
+sub add_row {
+    my ($self, $pos_in_results, $result) = @_;
 
-#sub show_lazily_added {
-#    my $self = shift;
-#
-#    # add to GUI items that have not yet been added
-#    my @items;
-#    foreach my $result ( $self->results->last_n( $self->{notshown} ) ) {
-#        push @items, @{$self->results->as_strings( $result )};
-#    }
-#    $self->InsertItems(\@items, $self->GetCount);
-#
-#    # and update the GUI
-#    $self->show(TRUE); # switch to this tab
-#    # focus the last result
-#    my $last = $self->GetCount - 1;
-#    $self->SetSelection($last); # highlight the first line of the added result
-#    $self->SetFirstItem($last); # scrolls to the item
-#
-#    $self->{notshown} = 0;
-#
-#    return $self;
-#}
+#   warn "Inserting at pos=" . $pos_in_results;
+
+    my @columns;
+
+    # add features as separate columns
+    push @columns, @{$result->test_item->features};
+    push @columns, $result->test_item->comment;
+
+    # for each class in the dataset...
+    my %scores = %{$result->scores};
+    for my $class (sort keys %scores) {
+        # score of this particular class
+        push @columns, $scores{$class};
+        # the score expresses in %
+        push @columns, AMGui::Results->to_pct($scores{$class},
+                                              $result->total_points);
+    }
+
+#   warn join(",", @columns);
+
+    if ( $self->GetColumnCount == 0 ) {
+        my $i = 0;
+        my @labels = map { "C" . ++$i } @columns;
+        $self->add_columns(\@labels);
+    }
+
+    my $row = $self->SUPER::add_row($pos_in_results, \@columns);
+    $self->adjust_column_widths;
+
+    return $row;
+}
 
 sub select {
     my $self = shift;
