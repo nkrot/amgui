@@ -27,7 +27,7 @@ sub new {
 sub add_columns {
     my ($self, $labels) = @_;
     my $col   = $self->GetColumnCount;
-	my $width = wxLIST_AUTOSIZE_USEHEADER;
+    my $width = wxLIST_AUTOSIZE_USEHEADER;
     foreach my $label (@{$labels}) {
         $self->InsertColumn($col++, _T($label), wxLIST_FORMAT_LEFT, $width);
     }
@@ -35,8 +35,16 @@ sub add_columns {
 }
 
 sub add_row {
-	my ($self, $data) = @_;
-	return 0;
+    my ($self, $columns, $str_item) = @_;
+    my $row = $self->GetItemCount;
+
+    $self->InsertStringItem($row, $str_item);
+
+    for (my $col=0; $col < scalar @{$columns}; $col++) {
+        $self->SetItem($row, $col, $columns->[$col]);
+    }
+
+    return $row;
 }
 
 sub adjust_column_widths {
