@@ -563,7 +563,6 @@ sub error {
     my ($self, $msg) = @_;
     Wx::MessageBox(_T($msg), "Error", Wx::wxOK|Wx::wxICON_ERROR);
     return 1;
-
 }
 
 1;
