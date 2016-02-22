@@ -16,7 +16,6 @@ use constant RESULTS => 'results';
 
 use Class::XSAccessor {
     getters => {
-        eol       => 'eol',
         path      => 'path',
         purpose   => 'purpose',
         filename  => 'filename'
@@ -42,7 +41,7 @@ sub new {
     );
     bless $self, $class;
     
-    $self->{eol}      = "\n"; # TODO: need something smarter
+    $self->{eol}      = undef;
     $self->{path}     = undef;
     $self->{filename} = undef;
 
@@ -67,6 +66,12 @@ sub set_lines {
     return $self;
 }
 
+sub eol {
+    my $self = shift;
+    $self->{eol} = "\n"  unless defined $self->{eol};
+    return $self->{eol};
+}
+
 #sub path {
 #    my $self = shift;
 #    return undef;
@@ -74,6 +79,7 @@ sub set_lines {
 
 sub set_path {
     my ($self, $path) = @_;
+#    warn "Viewer->sep_path called with $path";
     $self->{path} = $path;
     return $self; # for method chaining
 }
