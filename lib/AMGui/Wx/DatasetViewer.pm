@@ -48,7 +48,7 @@ sub new {
         my $data_item = $self->dataset->nth_item($i); # AM::DataSet::Item
         $self->add_row($i, $data_item);
     }
-	$self->adjust_column_widths;
+    $self->adjust_column_widths;
 
     # show the table in a new notebook page
     $self->main->notebook->AddPage($self, $self->{title}, 1);
@@ -149,7 +149,6 @@ sub training {
     my $self = shift;
     return $self->dataset->training; #=> AMGui::DataSet
 }
-
 
 # full path to the associated file
 sub path {
