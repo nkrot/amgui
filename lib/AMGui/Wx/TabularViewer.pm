@@ -3,11 +3,14 @@ package AMGui::Wx::TabularViewer;
 use strict;
 use warnings;
 
+use Text::CSV;
+
 use Wx qw[:everything];
 use Wx::Locale gettext => '_T';
 
-# TODO: no need to use it as a base class? use association instead
-our @ISA = 'Wx::ListView';
+use AMGui::Wx::Viewer;
+
+our @ISA = ('Wx::ListView', 'AMGui::Wx::Viewer');
 
 sub new {
     my ($class, $parent) = @_;
@@ -21,7 +24,7 @@ sub new {
     );
     bless $self, $class;
 
-	return $self;
+    return $self;
 }
 
 sub add_columns {
@@ -31,7 +34,7 @@ sub add_columns {
     foreach my $label (@{$labels}) {
         $self->InsertColumn($col++, _T($label), wxLIST_FORMAT_LEFT, $width);
     }
-	return $self->GetColumnCount;
+    return $self->GetColumnCount;
 }
 
 sub add_row {
@@ -47,12 +50,27 @@ sub add_row {
     return $row;
 }
 
+sub rows {
+    my $self = shift;
+    my @rows;
+    for (my $r = 0; $r < $self->GetItemCount; $r++) {
+        my @cols = ();
+        for (my $c=0; $c < $self->GetColumnCount; $c++) {
+            my $cell = $self->GetItem($r, $c); #=> ListItem
+            $cell = $cell->GetText if defined $cell;
+            push @cols, $cell;
+        }
+        push @rows, \@cols;
+    }
+    return @rows;
+}
+
 sub adjust_column_widths {
     my ($self) = @_;
     for (my $i=0; $i < $self->GetColumnCount; $i++) {
         $self->SetColumnWidth($i, $self->best_column_width($i));
     }
-	return 1;
+    return 1;
 }
 
 sub best_column_width {
@@ -70,6 +88,25 @@ sub best_column_width {
 #    }
 
     return $width;
+}
+
+# https://metacpan.org/pod/Text%3a%3aCSV
+# TODO: when saving to CSV
+# ? always_quote
+#   By default the generated fields are quoted only, if they need to, for example, if they contain the separator. If you set this attribute to a TRUE value, then all defined fields will be quoted. This is typically easier to handle in external applications.
+# ? how to add column names?
+sub save {
+    my $self = shift;
+    my %csv_opts = ( binary => 1 ) #, always_quote => 1 );
+    my $csv = Text::CSV->new( \%csv_opts )
+        or die "Cannot use CSV: " . Text::CSV->error_diag(); # TODO: this should be shown as a dialog
+
+    open my $fh, '>', $self->path;
+
+    $csv->eol($self->eol);
+    $csv->print($fh, $_) for $self->rows;
+
+    return CORE::close $fh;
 }
 
 1;
