@@ -169,19 +169,19 @@ sub set_classifier {
 }
 
 # TODO
-sub path {
-    warn "ResultViewer::path called";
-    return undef;
-}
+#sub path {
+#    warn "ResultViewer::path called";
+#    return undef;
+#}
 
-sub set_path {
-    my ($self, $path) = @_;
-    warn "ResultViewer::set_path called";
-    return $self;
-}
+#sub set_path {
+#    my ($self, $path) = @_;
+#    warn "ResultViewer::set_path called";
+#    return $self;
+#}
 
-sub save {
-    my $self = shift;
-}
+#sub save {
+#    my $self = shift;
+#}
 
 1;
