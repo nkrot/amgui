@@ -109,10 +109,7 @@ sub add {
     $self->show(TRUE); # and switch to this very tab
 
     my $row = $self->add_row($idx, $result);
-
-##    my $count = $self->GetCount;
-##    my $items = $self->results->as_strings( $result );
-##    $self->InsertItems( $items, $count );
+    #warn ${$result->statistical_summary};
 
     # Focus the most recent result
     $self->Select($row, TRUE); # highlight the first line of the added result

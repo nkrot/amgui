@@ -32,6 +32,7 @@ sub to_pct {
     return sprintf($percentage_format, 100 * $part / $whole);
 }
 
+# TODO: unused
 sub as_strings {
     my ($self, $result) = @_;
     my $lines = [
@@ -53,7 +54,7 @@ sub as_strings {
     return $lines;
 }
 
-# TODO: this is shit!
+# TODO: this is shit! probably no longer used and can be deleted
 # a method for converting to a string should rather be added to the classes handled here
 sub as_string {
     my ($self, $obj) = @_;
