@@ -97,7 +97,7 @@ sub best_column_width {
 # ? how to add column names?
 sub save {
     my $self = shift;
-    my %csv_opts = ( binary => 1 ) #, always_quote => 1 );
+    my %csv_opts = ( binary => 1 ); #, always_quote => 1 );
     my $csv = Text::CSV->new( \%csv_opts )
         or die "Cannot use CSV: " . Text::CSV->error_diag(); # TODO: this should be shown as a dialog
 
