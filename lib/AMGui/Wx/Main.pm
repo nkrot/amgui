@@ -24,6 +24,8 @@ use AMGui::Wx::StatusBar;
 
 our @ISA = 'Wx::Frame';
 
+#print Wx->VERSION; #=> 0.9928
+
 use Class::XSAccessor {
     getters => {
         notebook  => 'notebook',
@@ -117,6 +119,18 @@ sub on_file_new {
     $event->Skip;
 }
 
+# TODO: possible?
+#sub create_format_selector_control {
+#    my ($parent) = @_;
+#    my $id = -1;
+#    my $pos = wxDefaultPosition;
+#    my $size = wxDefaultSize;
+#    my $style = undef;
+#    my $choices = ["commas", "nocommas"]; # only those that are supported by AM::DataSet
+#    my $choice = Wx::Choice->new($parent, $id, $pos, $size, $choices, $style);
+#    return $choice;
+#}
+
 sub on_file_open {
     my ($self, $event) = @_;
 
@@ -135,6 +149,9 @@ sub on_file_open {
         $wildcard,
         wxFD_OPEN|wxFD_FILE_MUST_EXIST
     );
+
+    # available in Wx-2.9+
+    #$dialog->SetExtraControlCreator(\&create_format_selector_control);
 
     # If the user really selected a file
     if ($dialog->ShowModal == wxID_OK)
