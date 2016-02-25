@@ -61,6 +61,8 @@ sub new {
         "   + Pressing Ctrl+S saves current tab data to the filename associated with the tab",
         "     + or to a new filename, if none is associated",
         "   + Pressing Ctrl+Shift+S asks the user for a filename and saves the current tab to that filename", 
+        "6. Controlling Linear/Quadratic",
+        "   + Menu item Run/Linear acts as toggle for switching between Linear (checked) and Quadratic modes"
     ];
 
     my $self = $class->SUPER::new(
