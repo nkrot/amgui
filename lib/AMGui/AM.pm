@@ -7,13 +7,16 @@ use Algorithm::AM;
 use Algorithm::AM::Batch;
 use AMGui::Results;
 
+#use Data::Dumper;
+
 use Class::XSAccessor {
     getters => {
         classifier    => 'classifier',
         training      => 'training',      # training dataset, AM::DataSet
         testing       => 'testing',       # testing dataset, AM::DataSet
         result        => 'result',        # last result, AM::Result
-        result_viewer => 'result_viewer'  # many results, AMGui::Results
+        result_viewer => 'result_viewer', # many results, AMGui::Results
+        options       => 'options'        # options that AM accepts (linear, include_nulls, include_given)
     },
     setters => {
         set_result_viewer => 'result_viewer'
@@ -21,9 +24,14 @@ use Class::XSAccessor {
 };
 
 sub new {
-    my $class = shift;
-    my $self = bless {}, $class;
+    my ($class, $opts) = @_;
 
+    my $self = bless {
+        options => {%$opts} # copy options
+    }, $class;
+
+    #print Dumper($self->options);
+    
     return $self;
 }
 
@@ -59,7 +67,12 @@ sub close {
 # Classify given test item using preset training set
 sub classify {
     my ($self, $test_item) = @_;
-    $self->{classifier} = Algorithm::AM->new(training_set => $self->training->data);
+    
+    my %options = ((
+        training_set => $self->training->data
+    ), %{$self->options});
+
+    $self->{classifier} = Algorithm::AM->new(%options);
     $self->{result} = $self->classifier->classify( $test_item ); #=> AM::Result
 
     $self->result_viewer->add( $self->result );
@@ -72,53 +85,31 @@ sub classify_all {
     my ($self, $testing) = @_;
     $self->set_testing($testing)  if defined $testing;
 
-    my $cnt_total = $self->testing->size;
-    my $cnt_correct = 0;
-
-    $self->{classifier} = Algorithm::AM::Batch->new(
+    my %options = ((
         training_set  => $self->training->data,
-        end_test_hook => sub {
-            my ($batch, $test_item, $result) = @_;
-            $cnt_correct++  if $result->result eq 'correct'; # TODO: AM::Result->is_correct
-
-            my $msg = "Total: " . $cnt_total . "; Correct: " . $cnt_correct;
-            #$self->result_viewer->add_lazily($result); # does not solve the problem
-            $self->result_viewer->add($result);
-            $self->result_viewer->show_in_statusbar($msg);
-
-            #print $test_item->comment . ' ' . $result->result . "\n";
-        }
-    );
-
-    #my @results =
+        end_test_hook => $self->am_end_test_hook
+    ), %{$self->options});
+    
+    $self->{classifier} = Algorithm::AM::Batch->new(%options);
     $self->classifier->classify_all( $self->testing->data );
-    #$self->result_viewer->show_lazily_added; # does not solve the problem
 
     return 1;
 }
 
-#sub example_from_analogize_pl {
-#    my $batch = Algorithm::AM::Batch->new(
-#        linear => $args{linear},
-#        exclude_given => !$args{include_given},
-#        exclude_nulls => !$args{include_nulls},
-#
-#        training_set => $train,
-#        # print the result of each classification at the time it is provided
-#        end_test_hook => sub {
-#            my ($batch, $test_item, $result) = @_;
-#            ++$count if $result->result eq 'correct';
-#            say $test_item->comment . ":\t" . $result->result . "\n";
-#            for (@print_methods) {
-#                if($_ eq 'gang_detailed'){
-#                    say ${ $result->gang_summary(1) };
-#                }else{
-#                    say ${ $result->$_ };
-#                }
-#            }
-#        }
-#    );
-#    $batch->classify_all($test);
-#}
+sub am_end_test_hook {
+    my ($self) = @_;
+    my ($cnt_total, $cnt_correct) = ($self->testing->size, 0);
+
+    return sub {
+        my ($batch, $test_item, $result) = @_;
+        $cnt_correct++  if $result->result eq 'correct'; # TODO: AM::Result->is_correct
+
+        my $msg = "Total: " . $cnt_total . "; Correct: " . $cnt_correct;
+        $self->result_viewer->add($result);
+        $self->result_viewer->show_in_statusbar($msg);
+
+        #print $test_item->comment . ' ' . $result->result . "\n";
+    }    
+}
 
 1;
