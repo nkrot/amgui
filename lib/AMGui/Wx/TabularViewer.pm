@@ -8,6 +8,7 @@ use Text::CSV;
 use Wx qw[:everything];
 use Wx::Locale gettext => '_T';
 
+use AMGui::Constant;
 use AMGui::Wx::Viewer;
 
 our @ISA = ('Wx::ListView', 'AMGui::Wx::Viewer');
@@ -107,6 +108,13 @@ sub save {
     $csv->print($fh, $_) for $self->rows;
 
     return CORE::close $fh;
+}
+
+sub focus {
+    my ($self, $rowid) = @_;
+    $self->Select($rowid, TRUE);
+    $self->Focus($rowid);
+    return TRUE;
 }
 
 1;
