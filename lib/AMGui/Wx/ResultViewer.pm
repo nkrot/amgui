@@ -111,9 +111,7 @@ sub add {
     my $row = $self->add_row($idx, $result);
     #warn ${$result->statistical_summary};
 
-    # Focus the most recent result
-    $self->Select($row, TRUE); # highlight the first line of the added result
-    $self->Focus($row);        # focuses and scrolls to the item
+    $self->focus($row); # highlight the the most recent result
 
     #$self->main->update_aui;
     #$self->notebook->Update;
@@ -156,6 +154,7 @@ sub add_row {
     return $row;
 }
 
+# TODO: same as TabularViewer::focus?
 sub select {
     my $self = shift;
     $self->notebook->SetSelection( $self->index );
