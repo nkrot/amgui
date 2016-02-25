@@ -31,6 +31,7 @@ use Class::XSAccessor {
         notebook  => 'notebook',
         menubar   => 'menubar',
         statusbar => 'statusbar',
+        amoptions => 'amoptions',
         cwd       => 'cwd',
         aui       => 'aui'
     },
@@ -48,6 +49,13 @@ sub new {
         unless defined $style;
 
     my $self = $class->SUPER::new($parent, $id, $title, $pos, $size, $style, $name);
+
+    # options that AM accepts
+    $self->{am_options} = {
+        linear        => FALSE,
+        include_given => FALSE,
+        include_nulls => FALSE
+    };
 
     #$self->{window_1} = Wx::SplitterWindow->new($self, wxID_ANY);
     #$self->{grid_1} = Wx::Grid->new($self->{window_1}, wxID_ANY);
@@ -79,6 +87,7 @@ sub new {
     Wx::Event::EVT_MENU($self, wxID_EXIT,          \&on_file_quit);
     Wx::Event::EVT_MENU($self, wxID_RUN_NEXT,      \&on_run_next_item);
     Wx::Event::EVT_MENU($self, wxID_RUN_BATCH,     \&on_run_batch);
+    Wx::Event::EVT_MENU($self, wxID_TOGGLE_LINEAR, \&on_toggle_linear);
     Wx::Event::EVT_MENU($self, wxID_NEXT_TAB,      \&on_next_tab);
     Wx::Event::EVT_MENU($self, wxID_PREV_TAB,      \&on_previous_tab);
     Wx::Event::EVT_MENU($self, wxID_HELP_CONTENTS, \&on_help_contents);
@@ -451,6 +460,14 @@ sub classify_item {
     }
 
     return 1;
+}
+
+sub on_toggle_linear {
+    my ($self, $event) = @_;
+    #$self->amoptions->{linear} = $self->menubar->FindItem(wxID_TOGGLE_LINEAR)->IsChecked || FALSE;
+    $self->amoptions->{linear} = $event->IsChecked || FALSE;
+    #$self->inform("New state is " . $self->config->{linear});
+    return $self->amoptions->{linear};
 }
 
 sub on_next_tab {
