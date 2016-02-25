@@ -378,7 +378,7 @@ sub on_run_batch {
         # that may already be associated with the dataset viewer
         my $result_viewer = AMGui::Wx::ResultViewer->new($self);
 
-        my $am = AMGui::AM->new;
+        my $am = AMGui::AM->new($self->amoptions);
         $am->set_training($dv_testing->training)->set_testing($dv_testing->dataset);
         $am->set_result_viewer($result_viewer);
         $am->classify_all;
@@ -454,7 +454,7 @@ sub classify_item {
         }
 
         # finally, create a classifier and run it
-        my $am = AMGui::AM->new;
+        my $am = AMGui::AM->new($self->amoptions);
         $am->set_training($training); #TODO: ->set_testing($test_item);
         $am->set_result_viewer($dataset_viewer->result_viewer);
         $am->classify($test_item);
