@@ -51,10 +51,10 @@ sub new {
     my $self = $class->SUPER::new($parent, $id, $title, $pos, $size, $style, $name);
 
     # options that AM accepts
-    $self->{am_options} = {
+    $self->{amoptions} = {
         linear        => FALSE,
-        include_given => FALSE,
-        include_nulls => FALSE
+        exclude_given => TRUE,
+        exclude_nulls => TRUE
     };
 
     #$self->{window_1} = Wx::SplitterWindow->new($self, wxID_ANY);
@@ -340,6 +340,7 @@ sub on_run_batch {
 
     #warn "Purpose:" . $curr_page->purpose;
 
+    # TODO: fix this warning: Use of uninitialized value in string eq at
     if ( $curr_page->purpose eq AMGui::Wx::Viewer::GENERAL ) {
         # ignore this page
         $self->inform("Please switch to a tab with a testing dataset and try again.");
