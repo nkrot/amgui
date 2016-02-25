@@ -92,6 +92,7 @@ sub classify_all {
     
     $self->{classifier} = Algorithm::AM::Batch->new(%options);
     $self->classifier->classify_all( $self->testing->data );
+    $self->result_viewer->focus(0);
 
     return 1;
 }
