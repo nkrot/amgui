@@ -15,6 +15,8 @@ use AMGui::Wx::Menu::Run      ();
 use AMGui::Wx::Menu::Window   ();
 use AMGui::Wx::Menu::Help     ();
 
+#use Data::Dumper;
+
 our $VERSION = '1.00';
 
 use Class::XSAccessor {
@@ -55,5 +57,20 @@ sub append {
     my ($self, $menu) = @_;
     $self->menubar->Append($menu, $menu->title);
 }
+
+#sub FindItem {
+#    my ($self, $id) = @_;
+#    return $self->menubar->FindItem($id);
+#}
+
+#sub IsChecked {
+#    my ($self, $id) = @_;
+#    my $item = $self->FindItem($id);
+#    {
+#        no strict 'refs';
+#        print "Instance METHOD IS  " . Dumper( \%{ref ($item)."::" }) ;
+#    }
+#    return $self->menubar->IsChecked($id);
+#}
 
 1;
