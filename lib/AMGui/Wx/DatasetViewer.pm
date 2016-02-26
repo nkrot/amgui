@@ -14,22 +14,17 @@ our @ISA = 'AMGui::Wx::TabularViewer';
 
 use Class::XSAccessor {
     getters => {
-        main          => 'main',
         dataset       => 'dataset',
         result_viewer => 'result_viewer'
     },
-    # setters => {
-        # set_result_viewer => 'result_viewer'
-    # }
 };
 
 sub new {
     my ($class, $main, $dataset) = @_;
 
-    my $self = $class->SUPER::new($main->notebook);
+    my $self = $class->SUPER::new($main);
     bless $self, $class;
 
-    $self->{main}          = $main;
     $self->{dataset}       = $dataset; # AMGui::Dataset
     $self->{title}         = $dataset->filename;
     $self->{result_viewer} = undef;

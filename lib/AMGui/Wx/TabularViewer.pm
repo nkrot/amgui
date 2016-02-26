@@ -13,19 +13,33 @@ use AMGui::Wx::Viewer;
 
 our @ISA = ('Wx::ListView', 'AMGui::Wx::Viewer');
 
+use Class::XSAccessor {
+    getters => {
+        main => 'main',
+    },
+};
+
 sub new {
-    my ($class, $parent) = @_;
+    my ($class, $main) = @_;
 
     my $self = $class->SUPER::new (
-        $parent,
+        $main->notebook,
         wxID_ANY,
         wxDefaultPosition,
         wxDefaultSize,
         wxLC_REPORT|wxLC_SINGLE_SEL|wxLC_HRULES|wxLC_VRULES
     );
     bless $self, $class;
+    
+    $self->{main} = $main;
+    $self->{statusbar_message} = '';
 
     return $self;
+}
+
+sub notebook {
+    my $self = shift;
+    return $self->main->notebook;
 }
 
 sub add_columns {
@@ -57,7 +71,7 @@ sub rows {
     for (my $r = 0; $r < $self->GetItemCount; $r++) {
         my @cols = ();
         for (my $c=0; $c < $self->GetColumnCount; $c++) {
-            my $cell = $self->GetItem($r, $c); #=> ListItem
+            my $cell = $self->GetItem($r, $c); #=> Wx::ListItem
             $cell = $cell->GetText if defined $cell;
             push @cols, $cell;
         }
@@ -115,6 +129,13 @@ sub focus {
     $self->Select($rowid, TRUE);
     $self->Focus($rowid);
     return TRUE;
+}
+
+sub show_in_statusbar {
+    my ($self, $msg) = @_;
+    $self->{statusbar_message} = $msg;
+    $self->main->statusbar->say($msg);
+    return $self;
 }
 
 1;

@@ -12,8 +12,6 @@ our @ISA = 'AMGui::Wx::TabularViewer';
 
 use Class::XSAccessor {
     getters => {
-        main           => 'main',
-        notebook       => 'notebook',
         index          => 'index',
         results        => 'results', # (list of) AMGui::Result
         dataset_viewer => 'dataset_viewer',
@@ -24,21 +22,16 @@ use Class::XSAccessor {
 sub new {
     my ($class, $main) = @_;
 
-    my $self = $class->SUPER::new($main->notebook);
+    my $self = $class->SUPER::new($main);
     bless $self, $class;
 
-    $self->Hide;
-
-    $self->{main} = $main;
+    #$self->Hide;
 
     $self->{results} = AMGui::Results->new;
     $self->{title}   = "Result";
     $self->{purpose} = AMGui::Wx::Viewer::RESULTS;
 
-    $self->{notebook} = $main->notebook;
     $self->{visible}  = FALSE;
-
-    $self->{statusbar_message} = '';
 
     # DatasetViewer associated with this ResultViewer
     $self->{dataset_viewer} = undef;
@@ -81,7 +74,7 @@ sub show {
 
     unless ( $self->{visible} ) {
         $self->{index} = $self->notebook->GetPageCount();
-        $self->{notebook}->AddPage($self, $self->{title}, TRUE);
+        $self->notebook->AddPage($self, $self->{title}, TRUE);
         $self->{visible} = TRUE;
     }
 
@@ -89,13 +82,6 @@ sub show {
         $self->select;
     }
 
-    return $self;
-}
-
-sub show_in_statusbar {
-    my ($self, $msg) = @_;
-    $self->{statusbar_message} = $msg;
-    $self->main->statusbar->say($msg);
     return $self;
 }
 
@@ -166,21 +152,5 @@ sub set_classifier {
     $self->{classifier} = $classifier;
     $classifier->set_result_viewer( $self );
 }
-
-# TODO
-#sub path {
-#    warn "ResultViewer::path called";
-#    return undef;
-#}
-
-#sub set_path {
-#    my ($self, $path) = @_;
-#    warn "ResultViewer::set_path called";
-#    return $self;
-#}
-
-#sub save {
-#    my $self = shift;
-#}
 
 1;
