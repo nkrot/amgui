@@ -111,27 +111,40 @@ sub add_row {
 #   warn "Inserting at pos=" . $pos_in_results;
 
     my @columns;
+    my @colnames unless $self->has_header;
 
     # add features as separate columns
     push @columns, @{$result->test_item->features};
+    unless ( $self->has_header ) {
+        # feature columns will be named F1,F2,..,Fn
+        push @colnames, map { "F" . ++$_ } 0..$#{$result->test_item->features};
+    }
+
+    # add the word being classified, conventionally placed in the comment
     push @columns, $result->test_item->comment;
+    unless ( $self->has_header ) {
+        push @colnames, "Comment";
+    }
 
     # for each class in the dataset...
     my %scores = %{$result->scores};
     for my $class (sort keys %scores) {
-        # score of this particular class
+        # score of this particular class (number of pointers)
         push @columns, $scores{$class};
-        # the score expresses in %
-        push @columns, AMGui::Results->to_pct($scores{$class},
-                                              $result->total_points);
+        # the score expressed in %
+        # TODO: would be good to get it from AM::Result
+        push @columns, AMGui::Results->to_pct($scores{$class}, $result->total_points);
+
+        unless ( $self->has_header ) {
+            push @colnames, ("${class}_ptrs", "${class}_pct");
+        }
     }
 
-#   warn join(",", @columns);
-
-    if ( $self->GetColumnCount == 0 ) {
-        my $i = 0;
-        my @labels = map { "C" . ++$i } @columns;
-        $self->add_columns(\@labels);
+   #warn join(",", @columns);
+   
+    unless ( $self->has_header ) {
+        #warn join(",", @colnames);
+        $self->add_columns(\@colnames);
     }
 
     my $row = $self->SUPER::add_row($pos_in_results, \@columns);
