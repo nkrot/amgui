@@ -11,12 +11,16 @@ use Wx::Locale gettext => '_T';
 use AMGui::Constant;
 use AMGui::Wx::Viewer;
 
+use Data::Dumper;
+
 our @ISA = ('Wx::ListView', 'AMGui::Wx::Viewer');
 
 use Class::XSAccessor {
     getters => {
-        main => 'main',
-    },
+        main           => 'main',
+        colnames       => 'colnames',
+        add_csv_header => 'add_csv_header'
+    }
 };
 
 sub new {
@@ -33,6 +37,8 @@ sub new {
     
     $self->{main} = $main;
     $self->{statusbar_message} = '';
+    $self->{colnames} = [];
+    $self->{add_csv_header} = TRUE;
 
     return $self;
 }
@@ -48,6 +54,7 @@ sub add_columns {
     my $width = wxLIST_AUTOSIZE_USEHEADER;
     foreach my $label (@{$labels}) {
         $self->InsertColumn($col++, _T($label), wxLIST_FORMAT_LEFT, $width);
+        push @{$self->colnames}, _T($label);
     }
     return $self->GetColumnCount;
 }
@@ -119,6 +126,8 @@ sub save {
     open my $fh, '>', $self->path;
 
     $csv->eol($self->eol);
+
+    $csv->print($fh, $self->colnames) if $self->add_csv_header;
     $csv->print($fh, $_) for $self->rows;
 
     return CORE::close $fh;
