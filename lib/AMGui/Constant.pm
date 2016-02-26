@@ -10,7 +10,8 @@ use warnings;
 #our @ISA = qw(Exporter);
 
 our @EXPORT = qw(
-    wxID_RUN_BATCH wxID_RUN_NEXT wxID_TOGGLE_LINEAR
+    wxID_RUN_BATCH wxID_RUN_NEXT
+    wxID_TOGGLE_LINEAR wxID_TOGGLE_INCLUDE_NULLS wxID_TOGGLE_INCLUDE_GIVEN
     wxID_OPEN_PROJECT
     wxID_NEXT_TAB wxID_PREV_TAB
     FALSE TRUE
@@ -21,6 +22,9 @@ our @EXPORT = qw(
 use constant wxID_RUN_BATCH     => 1010;
 use constant wxID_RUN_NEXT      => 1011;
 use constant wxID_TOGGLE_LINEAR => 1012;
+use constant wxID_TOGGLE_INCLUDE_NULLS => 1013;
+use constant wxID_TOGGLE_INCLUDE_GIVEN => 1014;
+
 # in File menu
 use constant wxID_OPEN_PROJECT  => 1020;
 # in Window menu

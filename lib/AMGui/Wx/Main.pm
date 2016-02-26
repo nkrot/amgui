@@ -88,6 +88,10 @@ sub new {
     Wx::Event::EVT_MENU($self, wxID_RUN_NEXT,      \&on_run_next_item);
     Wx::Event::EVT_MENU($self, wxID_RUN_BATCH,     \&on_run_batch);
     Wx::Event::EVT_MENU($self, wxID_TOGGLE_LINEAR, \&on_toggle_linear);
+    Wx::Event::EVT_MENU($self, wxID_TOGGLE_INCLUDE_NULLS, 
+						\&on_toggle_include_nulls);
+    Wx::Event::EVT_MENU($self, wxID_TOGGLE_INCLUDE_GIVEN, 
+						\&on_toggle_include_given);
     Wx::Event::EVT_MENU($self, wxID_NEXT_TAB,      \&on_next_tab);
     Wx::Event::EVT_MENU($self, wxID_PREV_TAB,      \&on_previous_tab);
     Wx::Event::EVT_MENU($self, wxID_HELP_CONTENTS, \&on_help_contents);
@@ -465,10 +469,20 @@ sub classify_item {
 
 sub on_toggle_linear {
     my ($self, $event) = @_;
-    #$self->amoptions->{linear} = $self->menubar->FindItem(wxID_TOGGLE_LINEAR)->IsChecked || FALSE;
     $self->amoptions->{linear} = $event->IsChecked || FALSE;
-    #$self->inform("New state is " . $self->config->{linear});
     return $self->amoptions->{linear};
+}
+
+sub on_toggle_include_nulls {
+    my ($self, $event) = @_;
+    $self->amoptions->{exclude_nulls} = not ($event->IsChecked || FALSE);
+    return $self->amoptions->{exclude_nulls};
+}
+
+sub on_toggle_include_given {
+    my ($self, $event) = @_;
+    $self->amoptions->{exclude_given} = not ($event->IsChecked || FALSE);
+    return $self->amoptions->{exclude_given};
 }
 
 sub on_next_tab {
