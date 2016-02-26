@@ -291,10 +291,14 @@ sub on_file_save_as {
         $cwd = File::Basename::dirname($page->path);
     }
     # suggested filename to save to
-    my $filename = 'outcome';
+    my $filename = 'outcome.csv';
 
     # TODO: add CSV and other formats
-    my $wildcard = _T('All Files') . ( AMGui::Constant::WIN32 ? '|*.*' : '|*' );
+    my $wildcard = join(
+        '|',
+        _T('CSV')       , '*.csv;*.CSV',
+        _T('All Files') , ( AMGui::Constant::WIN32 ? '*.*' : '*' )
+    );
 
     my $dialog = Wx::FileDialog->new(
         $self,
