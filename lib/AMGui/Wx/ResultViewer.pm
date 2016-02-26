@@ -140,11 +140,24 @@ sub add_row {
         }
     }
 
+    push @columns, ($result->exclude_nulls  ? 'excluded' : 'included');
+    push @columns, ($result->given_excluded ? 'excluded' : 'included');
+    push @columns, $result->count_method;
+    push @columns, $result->training_set->size;
+    push @columns, $result->cardinality;
+    #warn join(",", @columns);
+
+    unless ( $self->has_header ) {
+        push @colnames, ("Nulls", "Given", "Gang", "Size of training set", "Cardinality");
+    }
+
    #warn join(",", @columns);
    
     unless ( $self->has_header ) {
         #warn join(",", @colnames);
+        #my $colcount = 
         $self->add_columns(\@colnames);
+        #warn "Number of columns: " . $colcount;
     }
 
     my $row = $self->SUPER::add_row($pos_in_results, \@columns);
