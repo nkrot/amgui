@@ -54,10 +54,11 @@ sub has_header {
 }
 
 sub add_columns {
-    my ($self, $labels) = @_;
+    my ($self, $colnames) = @_;
     my $col   = $self->GetColumnCount;
     my $width = wxLIST_AUTOSIZE_USEHEADER;
-    foreach my $label (@{$labels}) {
+    #warn "TabularViewer::add_columns: " . $colnames;
+    foreach my $label (@{$colnames}) {
         $self->InsertColumn($col++, _T($label), wxLIST_FORMAT_LEFT, $width);
         push @{$self->colnames}, _T($label);
     }
@@ -66,6 +67,7 @@ sub add_columns {
 
 sub add_row {
     my ($self, $str_item, $columns) = @_;
+    #warn "TabularViewer::add_row: " . $columns;
     my $row = $self->GetItemCount;
     $self->InsertStringItem($row, $str_item);
     for (my $col=0; $col < scalar @{$columns}; $col++) {
