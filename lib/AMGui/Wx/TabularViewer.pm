@@ -11,7 +11,7 @@ use Wx::Locale gettext => '_T';
 use AMGui::Constant;
 use AMGui::Wx::Viewer;
 
-use Data::Dumper;
+#use Data::Dumper;
 
 our @ISA = ('Wx::ListView', 'AMGui::Wx::Viewer');
 
