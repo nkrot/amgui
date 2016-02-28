@@ -126,10 +126,18 @@ sub add_row {
         push @colnames, "Comment";
     }
 
+#   # expected and predicted classes
+#   push @columns, ($result->test_item->class, );
+#   unless ( $self->has_header ) {
+#       push @colnames, ("Expected", "Predicted");
+#   }
+    
     # for each class in the dataset...
     my @classes = $result->training_set->classes; # contains all classes
     my %scores = %{$result->scores}; # contains only classes for this item
+    my $i = 0;
     for my $class (sort @classes) {
+        push @columns, $class;
         # score of this particular class (number of pointers)
         push @columns, $scores{$class};
         # the score expressed in %
@@ -138,7 +146,7 @@ sub add_row {
         push @columns, AMGui::Results->to_pct($scores{$class}, $result->total_points);
 
         unless ( $self->has_header ) {
-            push @colnames, ("${class}_ptrs", "${class}_pct");
+            push @colnames, ("Class ". ++$i, "${class}_ptrs", "${class}_pct");
         }
     }
 
