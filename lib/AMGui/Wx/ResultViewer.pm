@@ -31,7 +31,7 @@ sub new {
     $self->{title}   = "Result";
     $self->{purpose} = AMGui::Wx::Viewer::RESULTS;
 
-    $self->{visible}  = FALSE;
+    $self->{visible} = FALSE;
 
     # DatasetViewer associated with this ResultViewer
     $self->{dataset_viewer} = undef;
@@ -127,12 +127,14 @@ sub add_row {
     }
 
     # for each class in the dataset...
-    my %scores = %{$result->scores};
-    for my $class (sort keys %scores) {
+    my @classes = $result->training_set->classes; # contains all classes
+    my %scores = %{$result->scores}; # contains only classes for this item
+    for my $class (sort @classes) {
         # score of this particular class (number of pointers)
         push @columns, $scores{$class};
         # the score expressed in %
         # TODO: would be good to get it from AM::Result
+        #       use AM::Result::scores_normalized for it?
         push @columns, AMGui::Results->to_pct($scores{$class}, $result->total_points);
 
         unless ( $self->has_header ) {
@@ -151,10 +153,12 @@ sub add_row {
         push @colnames, ("Nulls", "Given", "Gang", "Size of training set", "Cardinality");
     }
 
-   #warn join(",", @columns);
-   
+#    warn "Num columns: " . scalar @columns;
+#    warn join(",", @columns);
+
     unless ( $self->has_header ) {
-        #warn join(",", @colnames);
+#       warn "Num colnames: " . scalar @colnames;
+#       warn join(",", @colnames);
         #my $colcount = 
         $self->add_columns(\@colnames);
         #warn "Number of columns: " . $colcount;
