@@ -126,11 +126,12 @@ sub add_row {
         push @colnames, "Comment";
     }
 
-#   # expected and predicted classes
-#   push @columns, ($result->test_item->class, );
-#   unless ( $self->has_header ) {
-#       push @colnames, ("Expected", "Predicted");
-#   }
+    # expected and predicted classes
+    # TODO: there can be 1+ predicted classes, in $result->winners;
+    push @columns, ($result->test_item->class);
+    unless ( $self->has_header ) {
+        push @colnames, "Expected"; # "Predicted"
+    }
     
     # for each class in the dataset...
     my @classes = $result->training_set->classes; # contains all classes
