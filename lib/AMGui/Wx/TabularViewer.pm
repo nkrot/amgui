@@ -40,6 +40,8 @@ sub new {
     $self->{colnames} = [];
     $self->{add_csv_header} = TRUE;
 
+    $self->{visible} = FALSE; # if the tab is active
+
     return $self;
 }
 
@@ -51,6 +53,23 @@ sub notebook {
 sub has_header {
     my $self = shift;
     return $#{$self->colnames} > -1;
+}
+
+sub show {
+    my ($self, $select) = @_;
+    $select = FALSE  unless defined $select;
+
+    unless ( $self->{visible} ) {
+        $self->{index} = $self->notebook->GetPageCount();
+        $self->notebook->AddPage($self, $self->{title}, TRUE);
+        $self->{visible} = TRUE;
+    }
+
+    if ( $select ) {
+        $self->select;
+    }
+
+    return $self;
 }
 
 sub add_columns {
@@ -142,6 +161,13 @@ sub focus {
     $self->Select($rowid, TRUE);
     $self->Focus($rowid);
     return TRUE;
+}
+
+# TODO: same as TabularViewer::focus?
+sub select {
+    my $self = shift;
+    $self->notebook->SetSelection( $self->index );
+    return $self;
 }
 
 sub show_in_statusbar {

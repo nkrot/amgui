@@ -25,13 +25,11 @@ sub new {
     my $self = $class->SUPER::new($main);
     bless $self, $class;
 
-    #$self->Hide;
-
     $self->{results} = AMGui::Results->new;
     $self->{title}   = "Result";
     $self->{purpose} = AMGui::Wx::Viewer::RESULTS;
 
-    $self->{visible} = FALSE;
+#	$self->Hide;
 
     # DatasetViewer associated with this ResultViewer
     $self->{dataset_viewer} = undef;
@@ -63,26 +61,9 @@ sub unset_dataset_viewer {
     if (defined $self->{dataset_viewer}) {
         my $viewer = $self->dataset_viewer;
         $self->{dataset_viewer} = undef;
-        $viewer->unset_result_viewer;
+        $viewer->unset_result_viewer; # TODO: what is several result viewers?
     }
     return 1;
-}
-
-sub show {
-    my ($self, $select) = @_;
-    $select = FALSE  unless defined $select;
-
-    unless ( $self->{visible} ) {
-        $self->{index} = $self->notebook->GetPageCount();
-        $self->notebook->AddPage($self, $self->{title}, TRUE);
-        $self->{visible} = TRUE;
-    }
-
-    if ( $select ) {
-        $self->select;
-    }
-
-    return $self;
 }
 
 # TODO: problem! when this method is called as a callback from classify_all
@@ -91,17 +72,9 @@ sub show {
 sub add {
     my ($self, $result) = @_;
     my $idx = $self->results->add( $result );
-
-    $self->show(TRUE); # and switch to this very tab
-
+    $self->show(TRUE);  # and switch to this very tab
     my $row = $self->add_row($idx, $result);
-    #warn ${$result->statistical_summary};
-
     $self->focus($row); # highlight the the most recent result
-
-    #$self->main->update_aui;
-    #$self->notebook->Update;
-
     return $self;
 }
 
@@ -177,13 +150,6 @@ sub add_row {
     $self->adjust_column_widths;
 
     return $row;
-}
-
-# TODO: same as TabularViewer::focus?
-sub select {
-    my $self = shift;
-    $self->notebook->SetSelection( $self->index );
-    return $self;
 }
 
 sub set_classifier {
