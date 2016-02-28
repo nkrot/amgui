@@ -28,6 +28,7 @@ sub add {
 
 sub to_pct {
     my ($self, $part, $whole) = @_;
+    $part = 0 unless defined $part;
     my $percentage_format = '%.3f'; # also defined in Algorithm::AM::Result
     return sprintf($percentage_format, 100 * $part / $whole);
 }
