@@ -12,7 +12,6 @@ our @ISA = 'AMGui::Wx::TabularViewer';
 
 use Class::XSAccessor {
     getters => {
-        index          => 'index',
         results        => 'results', # (list of) AMGui::Result
         dataset_viewer => 'dataset_viewer',
         purpose        => 'purpose'

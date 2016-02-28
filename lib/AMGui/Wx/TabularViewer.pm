@@ -60,7 +60,7 @@ sub show {
     $select = FALSE  unless defined $select;
 
     unless ( $self->{visible} ) {
-        $self->{index} = $self->notebook->GetPageCount();
+        $self->{page_index} = $self->notebook->GetPageCount();
         $self->notebook->AddPage($self, $self->{title}, TRUE);
         $self->{visible} = TRUE;
     }
@@ -86,11 +86,10 @@ sub add_columns {
 
 sub add_row {
     my ($self, $str_item, $columns) = @_;
-    #warn "TabularViewer::add_row: " . $columns;
     my $row = $self->GetItemCount;
     $self->InsertStringItem($row, $str_item);
     for (my $col=0; $col < scalar @{$columns}; $col++) {
-        $self->SetItem($row, $col, $columns->[$col]);
+        $self->SetItem($row, $col, $columns->[$col] || '');
     }
     return $row;
 }
@@ -166,7 +165,7 @@ sub focus {
 # TODO: same as TabularViewer::focus?
 sub select {
     my $self = shift;
-    $self->notebook->SetSelection( $self->index );
+    $self->notebook->SetSelection( $self->{page_index} );
     return $self;
 }
 
