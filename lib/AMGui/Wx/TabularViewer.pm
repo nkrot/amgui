@@ -87,9 +87,11 @@ sub add_columns {
 sub add_row {
     my ($self, $str_item, $columns) = @_;
     my $row = $self->GetItemCount;
+    my $val;
     $self->InsertStringItem($row, $str_item);
     for (my $col=0; $col < scalar @{$columns}; $col++) {
-        $self->SetItem($row, $col, $columns->[$col] || '');
+        $val = defined $columns->[$col] ? $columns->[$col] : '';
+        $self->SetItem($row, $col, $val);
     }
     return $row;
 }

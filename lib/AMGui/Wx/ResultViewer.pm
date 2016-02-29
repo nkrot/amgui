@@ -109,9 +109,8 @@ sub add_row {
     my %scores = %{$result->scores}; # contains only classes for this item
     my $i = 0;
     for my $class (sort @classes) {
-        push @columns, $class;
-        # score of this particular class (number of pointers)
-        push @columns, $scores{$class};
+        push @columns, $class;                 # class name
+        push @columns, ($scores{$class} || 0); # score of this particular class (number of pointers)
         # the score expressed in %
         # TODO: would be good to get it from AM::Result
         #       use AM::Result::scores_normalized for it?

@@ -26,6 +26,7 @@ sub add {
     return $count; # position of the newly added item
 }
 
+# TODO: if $part equals 0 then the outputted value is 0.000. is it okey?
 sub to_pct {
     my ($self, $part, $whole) = @_;
     $part = 0 unless defined $part;
