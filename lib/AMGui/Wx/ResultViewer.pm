@@ -129,7 +129,7 @@ sub add_row {
     #warn join(",", @columns);
 
     unless ( $self->has_header ) {
-        push @colnames, ("Nulls", "Given", "Gang", "Size of training set", "Cardinality");
+        push @colnames, ("Nulls", "Given", "Gang", "Size of training set", "No. of features considered");
     }
 
 #    warn "Num columns: " . scalar @columns;
