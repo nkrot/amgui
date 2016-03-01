@@ -32,6 +32,7 @@ use Class::XSAccessor {
         menubar   => 'menubar',
         statusbar => 'statusbar',
         amoptions => 'amoptions',
+        reports   => 'reports',
         cwd       => 'cwd',
         aui       => 'aui'
     },
@@ -50,13 +51,19 @@ sub new {
 
     my $self = $class->SUPER::new($parent, $id, $title, $pos, $size, $style, $name);
 
-    # options that AM accepts
+    # options that AM accepts, the default state
     $self->{amoptions} = {
         linear        => FALSE,
         exclude_given => TRUE,
         exclude_nulls => TRUE
     };
 
+    $self->{reports} = {
+        wxID_REPORT_PREDICTION     => TRUE,
+        wxID_REPORT_ANALOGICAL_SET => FALSE,
+        wxID_REPORT_GANGS          => FALSE
+    };
+    
     #$self->{window_1} = Wx::SplitterWindow->new($self, wxID_ANY);
     #$self->{grid_1} = Wx::Grid->new($self->{window_1}, wxID_ANY);
 
@@ -78,6 +85,7 @@ sub new {
 
     $self->{notebook} = AMGui::Wx::Notebook->new($self);
 
+    # menu File
     Wx::Event::EVT_MENU($self, wxID_NEW,           \&on_file_new);
     Wx::Event::EVT_MENU($self, wxID_OPEN,          \&on_file_open);
     Wx::Event::EVT_MENU($self, wxID_OPEN_PROJECT,  \&on_file_open_project);
@@ -85,13 +93,20 @@ sub new {
     Wx::Event::EVT_MENU($self, wxID_SAVE,          \&on_file_save);
     Wx::Event::EVT_MENU($self, wxID_SAVEAS,        \&on_file_save_as);
     Wx::Event::EVT_MENU($self, wxID_EXIT,          \&on_file_quit);
-    Wx::Event::EVT_MENU($self, wxID_RUN_NEXT,      \&on_run_next_item);
-    Wx::Event::EVT_MENU($self, wxID_RUN_BATCH,     \&on_run_batch);
-    Wx::Event::EVT_MENU($self, wxID_TOGGLE_LINEAR, \&on_toggle_linear);
-    Wx::Event::EVT_MENU($self, wxID_TOGGLE_INCLUDE_NULLS, 
-						\&on_toggle_include_nulls);
-    Wx::Event::EVT_MENU($self, wxID_TOGGLE_INCLUDE_GIVEN, 
-						\&on_toggle_include_given);
+
+    # menu Reports
+    Wx::Event::EVT_MENU($self, wxID_REPORT_PREDICTION,     \&on_toggle_report_prediction);
+    Wx::Event::EVT_MENU($self, wxID_REPORT_ANALOGICAL_SET, \&on_toggle_report_analogical_set);
+    Wx::Event::EVT_MENU($self, wxID_REPORT_GANGS,          \&on_toggle_report_gangs);
+
+    # menu Run
+    Wx::Event::EVT_MENU($self, wxID_RUN_NEXT,          \&on_run_next_item);
+    Wx::Event::EVT_MENU($self, wxID_RUN_BATCH,         \&on_run_batch);
+    Wx::Event::EVT_MENU($self, wxID_RUN_LINEAR,        \&on_toggle_linear);
+    Wx::Event::EVT_MENU($self, wxID_RUN_INCLUDE_NULLS, \&on_toggle_include_nulls);
+    Wx::Event::EVT_MENU($self, wxID_RUN_INCLUDE_GIVEN, \&on_toggle_include_given);
+    
+    # menu Window
     Wx::Event::EVT_MENU($self, wxID_NEXT_TAB,      \&on_next_tab);
     Wx::Event::EVT_MENU($self, wxID_PREV_TAB,      \&on_previous_tab);
     Wx::Event::EVT_MENU($self, wxID_HELP_CONTENTS, \&on_help_contents);
@@ -469,6 +484,33 @@ sub classify_item {
     }
 
     return 1;
+}
+
+# &&&
+sub on_toggle_report_prediction {
+    my ($self, $event) = @_;
+    my $name = wxID_REPORT_PREDICTION;
+    $self->reports->{name} = ($event->IsChecked || FALSE);
+    $self->inform("Report Prediction is set to " . $self->reports->{name});
+    return $self->reports->{name};
+}
+
+sub on_toggle_report_analogical_set {
+    my ($self, $event) = @_;
+    my $name = wxID_REPORT_ANALOGICAL_SET;
+    $self->reports->{name} = ($event->IsChecked || FALSE);
+    $self->inform("Report Analogical Set is set to " . $self->reports->{name});
+    return $self->reports->{name};
+}
+
+sub on_toggle_report_gangs {
+    my ($self, $event) = @_;
+    my $name = wxID_REPORT_GANGS;
+    $self->error("Report Gangs has not yet been implemented");
+    $self->reports->{name} = FALSE;
+    $self->menubar->Check(wxID_REPORT_GANGS, FALSE);
+    #TODO#$self->reports->{name} = ($event->IsChecked || FALSE);
+    return $self->reports->{name};
 }
 
 sub on_toggle_linear {
