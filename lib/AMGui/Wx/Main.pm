@@ -58,6 +58,7 @@ sub new {
         exclude_nulls => TRUE
     };
 
+    # NOTE, the keys are *literal Strings*, not numeric values associated with these constants!
     $self->{reports} = {
         wxID_REPORT_PREDICTION     => TRUE,
         wxID_REPORT_ANALOGICAL_SET => FALSE,
@@ -359,8 +360,8 @@ sub on_run_batch {
     my $dv_testing; # DatasetViewer with the testing dataset
     my $curr_page = $self->notebook->get_current_page;
 
-    return 0 unless $curr_page;
-
+    return 0 unless $curr_page; # TODO: report an error?
+  
     #warn "Purpose:" . $curr_page->purpose;
 
     # TODO: fix this warning: Use of uninitialized value in string eq at
@@ -391,6 +392,8 @@ sub on_run_batch {
         $dv_testing = $curr_page;
     }
 
+    $self->is_report_selected or return 0;
+
     if (defined $dv_testing
         # Checking availability of training dataset to avoid advancing to the next item
         # in the situation that classification will turn out impossible.
@@ -402,6 +405,7 @@ sub on_run_batch {
         my $result_viewer = AMGui::Wx::ResultViewer->new($self);
 
         my $am = AMGui::AM->new($self->amoptions);
+        # $am->set_reports(...);
         $am->set_training($dv_testing->training)->set_testing($dv_testing->dataset);
         $am->set_result_viewer($result_viewer);
         $am->classify_all;
@@ -439,6 +443,8 @@ sub on_run_next_item {
         # This dataset is used both as training and as testing (leave-one-out)
         $dv_testing = $curr_page;
     }
+
+    $self->is_report_selected or return 0;
 
     if (defined $dv_testing
         # Checking availability of training dataset to avoid advancing to the next item
@@ -486,31 +492,30 @@ sub classify_item {
     return 1;
 }
 
-# &&&
 sub on_toggle_report_prediction {
     my ($self, $event) = @_;
-    my $name = wxID_REPORT_PREDICTION;
-    $self->reports->{name} = ($event->IsChecked || FALSE);
-    $self->inform("Report Prediction is set to " . $self->reports->{name});
-    return $self->reports->{name};
+    my $name = 'wxID_REPORT_PREDICTION'; # must be a String!
+    $self->reports->{$name} = ($event->IsChecked || FALSE);
+    #$self->inform("Report Prediction is set to " . $self->reports->{$name});
+    return $self->reports->{$name};
 }
 
 sub on_toggle_report_analogical_set {
     my ($self, $event) = @_;
-    my $name = wxID_REPORT_ANALOGICAL_SET;
-    $self->reports->{name} = ($event->IsChecked || FALSE);
-    $self->inform("Report Analogical Set is set to " . $self->reports->{name});
-    return $self->reports->{name};
+    my $name = 'wxID_REPORT_ANALOGICAL_SET'; # must be a String
+    $self->reports->{$name} = ($event->IsChecked || FALSE);
+    #$self->inform("Report Analogical Set is set to " . $self->reports->{$name});
+    return $self->reports->{$name};
 }
 
 sub on_toggle_report_gangs {
     my ($self, $event) = @_;
-    my $name = wxID_REPORT_GANGS;
+    my $name = 'wxID_REPORT_GANGS'; # must be a String
     $self->error("Report Gangs has not yet been implemented");
-    $self->reports->{name} = FALSE;
-    $self->menubar->Check(wxID_REPORT_GANGS, FALSE);
-    #TODO#$self->reports->{name} = ($event->IsChecked || FALSE);
-    return $self->reports->{name};
+    $self->reports->{$name} = FALSE;
+    $self->menubar->Check(wxID_REPORT_GANGS, FALSE); # do not use $name, it is a string
+    #TODO#$self->reports->{$name} = ($event->IsChecked || FALSE);
+    return $self->reports->{$name};
 }
 
 sub on_toggle_linear {
@@ -635,6 +640,17 @@ sub is_valid_dataset {
         $self->error($msg);
     }
     return $status;
+}
+
+sub is_report_selected {
+    my $self = shift;
+    my $report_requested = grep {$_ eq TRUE} values %{$self->reports};
+
+    unless ( $report_requested ) {
+        $self->error("No report has been selected. Please go to Reports menu and select one or more reports");
+    }
+
+    return $report_requested;
 }
 
 ######################################################################
