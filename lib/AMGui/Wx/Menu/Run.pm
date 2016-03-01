@@ -18,11 +18,11 @@ sub new {
     
     # tips are shown in the status bar
     my %tips = (
-        wxID_RUN_NEXT             => _T("Classifies the next-after-highlighted item in the testing dataset."),
-        wxID_RUN_BATCH            => _T("Classifies the whole testing dataset"),
-        wxID_TOGGLE_LINEAR        => _T("For computing scores Linear uses occurrences, Quadratic uses pointers."),
-        wxID_TOGGLE_INCLUDE_NULLS => _T("If checked, treats null variables in a test item as regular variables."),
-        wxID_TOGGLE_INCLUDE_GIVEN => _T("If checked, allows a test item to be included in the data set during classification.")
+        wxID_RUN_NEXT          => _T("Classifies the next-after-highlighted item in the testing dataset."),
+        wxID_RUN_BATCH         => _T("Classifies the whole testing dataset"),
+        wxID_RUN_LINEAR        => _T("For computing scores Linear uses occurrences, Quadratic uses pointers."),
+        wxID_RUN_INCLUDE_NULLS => _T("If checked, treats null variables in a test item as regular variables."),
+        wxID_RUN_INCLUDE_GIVEN => _T("If checked, allows a test item to be included in the data set during classification.")
     );
     
     $self->Append(wxID_RUN_NEXT,
@@ -34,15 +34,15 @@ sub new {
 
     $self->AppendSeparator;
 
-    $self->AppendCheckItem(wxID_TOGGLE_LINEAR,
+    $self->AppendCheckItem(wxID_RUN_LINEAR,
                            _T("&Linear"),
-                           $tips{wxID_TOGGLE_LINEAR});
-    $self->AppendCheckItem(wxID_TOGGLE_INCLUDE_NULLS,
+                           $tips{wxID_RUN_LINEAR});
+    $self->AppendCheckItem(wxID_RUN_INCLUDE_NULLS,
                            _T("Include &nulls"), 
-                           $tips{wxID_TOGGLE_INCLUDE_NULLS});
-    $self->AppendCheckItem(wxID_TOGGLE_INCLUDE_GIVEN,
+                           $tips{wxID_RUN_INCLUDE_NULLS});
+    $self->AppendCheckItem(wxID_RUN_INCLUDE_GIVEN,
                            _T("Include &given"), 
-                           $tips{wxID_TOGGLE_INCLUDE_GIVEN});
+                           $tips{wxID_RUN_INCLUDE_GIVEN});
     
     return $self;
 }
