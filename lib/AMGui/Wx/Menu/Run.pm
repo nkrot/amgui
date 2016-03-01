@@ -37,12 +37,20 @@ sub new {
     $self->AppendCheckItem(wxID_RUN_LINEAR,
                            _T("&Linear"),
                            $tips{wxID_RUN_LINEAR});
+    $self->Check(wxID_RUN_LINEAR,
+                 $main->amoptions->{linear});
+    
     $self->AppendCheckItem(wxID_RUN_INCLUDE_NULLS,
                            _T("Include &nulls"), 
                            $tips{wxID_RUN_INCLUDE_NULLS});
+    $self->Check(wxID_RUN_INCLUDE_NULLS,
+                 !$main->amoptions->{exclude_nulls});
+    
     $self->AppendCheckItem(wxID_RUN_INCLUDE_GIVEN,
                            _T("Include &given"), 
                            $tips{wxID_RUN_INCLUDE_GIVEN});
+    $self->Check(wxID_RUN_INCLUDE_GIVEN,
+                 !$main->amoptions->{exclude_given});
     
     return $self;
 }
