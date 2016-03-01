@@ -10,7 +10,7 @@ use AMGui::Wx                 ();
 use AMGui::Wx::Menu::File     ();
 #use AMGui::Wx::Menu::Edit     ();
 #use AMGui::Wx::Menu::Search   ();
-#use AMGui::Wx::Menu::View     ();
+use AMGui::Wx::Menu::Report   ();
 use AMGui::Wx::Menu::Run      ();
 use AMGui::Wx::Menu::Window   ();
 use AMGui::Wx::Menu::Help     ();
@@ -26,6 +26,7 @@ use Class::XSAccessor {
 
         # individual menus
         file    => 'file',
+        report  => 'report',
         run     => 'run',
         window  => 'window',
         help    => 'help'
@@ -41,11 +42,13 @@ sub new {
     }, $class;
 
     $self->{file}   = AMGui::Wx::Menu::File->new($main);
+    $self->{report} = AMGui::Wx::Menu::Report->new($main);
     $self->{run}    = AMGui::Wx::Menu::Run->new($main);
     $self->{window} = AMGui::Wx::Menu::Window->new($main);
     $self->{help}   = AMGui::Wx::Menu::Help->new($main);
 
     $self->append($self->{file});
+    $self->append($self->{report});
     $self->append($self->{run});
     $self->append($self->{window});
     $self->append($self->{help});
