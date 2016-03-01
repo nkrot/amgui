@@ -16,8 +16,17 @@ sub new {
     my $self = $class->SUPER::new(@_);
     bless $self, $class;
 
-    $self->Append(wxID_NEXT_TAB, _T("Next Tab\tCtrl+PGDN"), "");
-    $self->Append(wxID_PREV_TAB, _T("Previous Tab\tCtrl+PGUP"), "");
+    my %tips = (
+        wxID_NEXT_TAB => _T("Switches to the tab on the right"),
+        wxID_PREV_TAB => _T("Switches to the tab on the left")
+    );
+
+    $self->Append(wxID_NEXT_TAB,
+                  _T("Next Tab\tCtrl+PGDN"),
+                  $tips{wxID_NEXT_TAB});
+    $self->Append(wxID_PREV_TAB,
+                  _T("Previous Tab\tCtrl+PGUP"),
+                  $tips{wxID_PREV_TAB});
     #$self->AppendSeparator();
   
     return $self;
