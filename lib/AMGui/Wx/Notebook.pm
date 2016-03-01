@@ -63,7 +63,9 @@ sub new {
         "   + Pressing Ctrl+Shift+S asks the user for a filename and saves the current tab to that filename.", 
         "6. Controlling Linear/Quadratic, Nulls and Given",
         "   + Menu Run/Linear acts as toggle for switching between Linear (checked) and Quadratic modes.",
-		"   + Menu Run/Include Nulls and Run/Include given act like toggle for corresponding options in AM library."
+		"   + Menu Run/Include Nulls and Run/Include given act like toggle for corresponding options in AM library.",
+		"7. Possibility to generate several/different types of reports",
+		"   + Menu Reports"
     ];
 
     my $self = $class->SUPER::new(
