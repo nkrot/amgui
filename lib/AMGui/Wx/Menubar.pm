@@ -47,18 +47,23 @@ sub new {
     $self->{window} = AMGui::Wx::Menu::Window->new($main);
     $self->{help}   = AMGui::Wx::Menu::Help->new($main);
 
-    $self->append($self->{file});
-    $self->append($self->{report});
-    $self->append($self->{run});
-    $self->append($self->{window});
-    $self->append($self->{help});
+    $self->Append($self->{file});
+    $self->Append($self->{report});
+    $self->Append($self->{run});
+    $self->Append($self->{window});
+    $self->Append($self->{help});
 
     return $self;
 }
 
-sub append {
+sub Append {
     my ($self, $menu) = @_;
     $self->menubar->Append($menu, $menu->title);
+}
+
+sub Check {
+    my ($self, $id, $state) = @_;
+    $self->menubar->Check($id, $state);
 }
 
 #sub FindItem {
