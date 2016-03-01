@@ -26,14 +26,20 @@ sub new {
     $self->AppendCheckItem(wxID_REPORT_PREDICTION,
                            _T("&Predicted Classification"),
                            $tips{wxID_REPORT_PREDICTION});
-    $self->Check(wxID_REPORT_PREDICTION, TRUE);
+    $self->Check(wxID_REPORT_PREDICTION,
+                 $main->reports->{wxID_REPORT_PREDICTION});
 
     $self->AppendCheckItem(wxID_REPORT_ANALOGICAL_SET,
                            _T("&Analogical Set"), 
                            $tips{wxID_REPORT_ANALOGICAL_SET});
+    $self->Check(wxID_REPORT_ANALOGICAL_SET, 
+                 $main->reports->{wxID_REPORT_ANALOGICAL_SET});
+
     $self->AppendCheckItem(wxID_REPORT_GANGS,
                            _T("&Gangs"), 
                            $tips{wxID_REPORT_GANGS});
+    $self->Check(wxID_REPORT_GANGS, 
+                 $main->reports->{wxID_REPORT_GANGS});
     
     return $self;
 }
