@@ -403,9 +403,9 @@ sub on_run_batch {
         # be careful! newly created ResultViewer must not override other ResultViewers
         # that may already be associated with the dataset viewer
         my $result_viewer = AMGui::Wx::ResultViewer->new($self);
+        $result_viewer->set_reports($self->reports);
 
         my $am = AMGui::AM->new($self->amoptions);
-        # $am->set_reports(...);
         $am->set_training($dv_testing->training)->set_testing($dv_testing->dataset);
         $am->set_result_viewer($result_viewer);
         $am->classify_all;
@@ -630,10 +630,13 @@ sub setup_data_viewer {
     return $dataset_viewer;
 }
 
+######################################################################
+# VALIDATORS
+# that check something and show an error message
+
 sub is_valid_dataset {
     my ($self, $dataset, $msg) = @_;
     $msg = MSG_TRAINING_NOT_FOUND unless defined $msg;
-
     my $status = TRUE;
     if (defined $dataset && defined $dataset->data) {
         # ok
