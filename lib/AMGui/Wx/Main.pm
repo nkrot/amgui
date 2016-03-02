@@ -397,7 +397,7 @@ sub on_run_batch {
     if (defined $dv_testing
         # Checking availability of training dataset to avoid advancing to the next item
         # in the situation that classification will turn out impossible.
-        && $self->is_valid_dataset($dv_testing->training, MSG_TRAINING_NOT_FOUND))
+        && $self->is_valid_dataset($dv_testing->training))
     {
         # TODO: recycle existing result viewer?
         # be careful! newly created ResultViewer must not override other ResultViewers
@@ -449,7 +449,7 @@ sub on_run_next_item {
     if (defined $dv_testing
         # Checking availability of training dataset to avoid advancing to the next item
         # in the situation that classification will turn out impossible.
-        && $self->is_valid_dataset($dv_testing->training, MSG_TRAINING_NOT_FOUND))
+        && $self->is_valid_dataset($dv_testing->training))
     {
         #warn "Testing:  " . $testing;
         #warn "Training: " . $training;
@@ -473,7 +473,7 @@ sub classify_item {
     # reach training dataset associated with the dataset loaded in the current DatasetViewer
     my $training  = $dataset_viewer->training; #=> AMGui::DataSet
 
-    if ( $self->is_valid_dataset($training, MSG_TRAINING_NOT_FOUND) ) {
+    if ( $self->is_valid_dataset($training) ) {
         # we want any new item from the current DatasetViewer to be outputted into
         # the same ResultViewer upon classification. If DatasetViewer already has
         # a ResultViewer associated with it, the latter will be reused. Otherwise
@@ -632,6 +632,8 @@ sub setup_data_viewer {
 
 sub is_valid_dataset {
     my ($self, $dataset, $msg) = @_;
+    $msg = MSG_TRAINING_NOT_FOUND unless defined $msg;
+
     my $status = TRUE;
     if (defined $dataset && defined $dataset->data) {
         # ok
@@ -644,12 +646,9 @@ sub is_valid_dataset {
 
 sub is_report_selected {
     my $self = shift;
+    my $msg = "No report has been selected. Please go to Reports menu and select one or more reports";
     my $report_requested = grep {$_ eq TRUE} values %{$self->reports};
-
-    unless ( $report_requested ) {
-        $self->error("No report has been selected. Please go to Reports menu and select one or more reports");
-    }
-
+    $self->error($msg) unless $report_requested;
     return $report_requested;
 }
 
