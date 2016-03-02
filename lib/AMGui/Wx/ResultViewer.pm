@@ -1,35 +1,36 @@
 package AMGui::Wx::ResultViewer;
+# TODO: perhaps this class should not be under Wx any more
 
 use strict;
 use warnings;
 
 use AMGui::Constant;
 use AMGui::Results;
-use AMGui::Wx::TabularViewer;
-use AMGui::Wx::Viewer;
 
-our @ISA = 'AMGui::Wx::TabularViewer';
+use AMGui::Wx::Report::Predictions;
+#use AMGui::Wx::Report::AnalogicalSet;
+#use AMGui::Wx::Report::GangsReport;
 
 use Class::XSAccessor {
     getters => {
         results        => 'results', # (list of) AMGui::Result
         dataset_viewer => 'dataset_viewer',
-        purpose        => 'purpose'
+        purpose        => 'purpose',
+        reports        => 'reports'
     }
 };
 
 sub new {
     my ($class, $main) = @_;
 
-    my $self = $class->SUPER::new($main);
-    bless $self, $class;
+    my $self = bless {}, $class;
 
     $self->{results} = AMGui::Results->new;
-    $self->{title}   = "Result";
     $self->{purpose} = AMGui::Wx::Viewer::RESULTS;
+    $self->{reports} = []; # an array of active reports
 
-#	$self->Hide;
-
+    $self->{predictions} = AMGui::Wx::Report::Predictions->new($main, $self);
+    
     # DatasetViewer associated with this ResultViewer
     $self->{dataset_viewer} = undef;
 
@@ -41,6 +42,20 @@ sub new {
 sub close {
     my $self = shift;
     $self->unset_dataset_viewer;
+}
+
+# TODO:
+sub set_reports {
+    my ($self, $reports) = @_;
+    # clear all current reports
+    # TODO: need to release viewers?
+    $self->{reports} = [];
+    
+    # set new reports
+    while (my ($key, $value) = each %$reports) {
+        push @{$self->reports}, $key if $value == TRUE;
+    }
+    return $self;
 }
 
 sub set_dataset_viewer {
@@ -70,89 +85,37 @@ sub unset_dataset_viewer {
 # until the processing has finished. Statusbar however is updated successfully!
 sub add {
     my ($self, $result) = @_;
-    my $idx = $self->results->add( $result );
-    $self->show(TRUE);  # and switch to this very tab
-    my $row = $self->add_row($idx, $result);
-    $self->focus($row); # highlight the the most recent result
-    return $self;
-}
-
-sub add_row {
-    my ($self, $pos_in_results, $result) = @_;
-
-#   warn "Inserting at pos=" . $pos_in_results;
-
-    my @columns;
-    my @colnames unless $self->has_header;
-
-    # add features as separate columns
-    push @columns, @{$result->test_item->features};
-    unless ( $self->has_header ) {
-        # feature columns will be named F1,F2,..,Fn
-        push @colnames, map { "F" . ++$_ } 0..$#{$result->test_item->features};
-    }
-
-    # add the word being classified, conventionally placed in the comment
-    push @columns, $result->test_item->comment;
-    unless ( $self->has_header ) {
-        push @colnames, "Comment";
-    }
-
-    # expected class and the result of prediction (correct, tie, incorrect)
-    push @columns, ($result->test_item->class, $result->result);
-    unless ( $self->has_header ) {
-        push @colnames, ("Expected", "Predicted");
-    }
+    my $idx = $self->results->add($result);
     
-    # for each class in the dataset...
-    my @classes = $result->training_set->classes; # contains all classes
-    my %scores = %{$result->scores}; # contains only classes for this item
-    my $i = 0;
-    for my $class (sort @classes) {
-        push @columns, $class;                 # class name
-        push @columns, ($scores{$class} || 0); # score of this particular class (number of pointers)
-        # the score expressed in %
-        # TODO: would be good to get it from AM::Result
-        #       use AM::Result::scores_normalized for it?
-        push @columns, AMGui::Results->to_pct($scores{$class}, $result->total_points);
-
-        unless ( $self->has_header ) {
-            push @colnames, ("Class ". ++$i, "${class}_ptrs", "${class}_pct");
-        }
-    }
-
-    push @columns, ($result->exclude_nulls  ? 'excluded' : 'included');
-    push @columns, ($result->given_excluded ? 'excluded' : 'included');
-    push @columns, $result->count_method;
-    push @columns, $result->training_set->size;
-    push @columns, $result->cardinality;
-    #warn join(",", @columns);
-
-    unless ( $self->has_header ) {
-        push @colnames, ("Nulls", "Given", "Gang", "Size of training set", "No. of features considered");
-    }
-
-#    warn "Num columns: " . scalar @columns;
-#    warn join(",", @columns);
-
-    unless ( $self->has_header ) {
-#       warn "Num colnames: " . scalar @colnames;
-#       warn join(",", @colnames);
-        #my $colcount = 
-        $self->add_columns(\@colnames);
-        #warn "Number of columns: " . $colcount;
-    }
-
-    my $row = $self->SUPER::add_row($pos_in_results, \@columns);
-    $self->adjust_column_widths;
-
-    return $row;
+    my $report = $self->{predictions};
+    $report->show(TRUE);  # and switch to this very tab
+    my $row = $report->add_row($idx, $result);
+    $report->focus($row); # highlight the the most recent result
+    
+    return $self;
 }
 
 sub set_classifier {
     my ($self, $classifier) = @_;
     $self->{classifier} = $classifier;
-    $classifier->set_result_viewer( $self );
+    $classifier->set_result_viewer($self);
+    return $self;
+}
+
+######################################################################
+# The following methods are simply forwarded to contained objects
+#
+
+sub focus {
+    my ($self, $idx) = @_;
+    my $report = $self->{predictions}; # TODO: select correct report
+    return $report->focus($idx);
+}
+
+sub show_in_statusbar {
+    my ($self, $msg) = @_;
+    my $report = $self->{predictions}; # TODO: select correct report
+    return $report->show_in_statusbar($msg);
 }
 
 1;
