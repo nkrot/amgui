@@ -5,6 +5,8 @@ use warnings;
 
 use Algorithm::AM;
 use Algorithm::AM::Batch;
+
+use AMGui::Constant;
 use AMGui::Results;
 
 #use Data::Dumper;
@@ -16,7 +18,7 @@ use Class::XSAccessor {
         testing       => 'testing',       # testing dataset, AM::DataSet
         result        => 'result',        # last result, AM::Result
         result_viewer => 'result_viewer', # many results, AMGui::Results
-        options       => 'options'        # options that AM accepts (linear, include_nulls, include_given)
+        options       => 'options'        # a hash of options that AM accepts (linear, include_nulls, include_given)
     },
     setters => {
         set_result_viewer => 'result_viewer'
@@ -30,8 +32,6 @@ sub new {
         options => {%$opts} # copy options
     }, $class;
 
-    #print Dumper($self->options);
-    
     return $self;
 }
 
