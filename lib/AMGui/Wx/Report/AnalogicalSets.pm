@@ -44,7 +44,7 @@ sub add_row {
 
     # generate column names using word itself (called comment in comma format)
     unless ($self->has_header) {
-        my @colnames;
+        my @colnames = ("Comment");
         for (my $i=0; $i < $result->training_set->size; $i++) {
             push @colnames, $result->training_set->get_item($i)->comment;
         }
@@ -52,8 +52,9 @@ sub add_row {
     }
 
     # fill in cells
-    my @columns;
+    my @columns = ($result->test_item->comment);
     while (my ($idx, $name) = each(@{$self->colnames})) {
+        next if $idx == 0; # skip Comment that identifies the test item
         push @columns, ($anset{$name} || 0);
     }
 
