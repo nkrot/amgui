@@ -306,8 +306,10 @@ sub on_file_save_as {
     if ( defined $page->path ) {
         $cwd = File::Basename::dirname($page->path);
     }
+
     # suggested filename to save to
-    my $filename = 'outcome.csv';
+    my $filename;
+    $filename = $page->output_filename if $page->can("output_filename");
 
     # TODO: add CSV and other formats
     my $wildcard = join(

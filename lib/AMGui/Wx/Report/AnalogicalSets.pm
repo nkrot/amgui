@@ -19,6 +19,7 @@ sub new {
     bless $self, $class;
     
     $self->{title}   = "Analogical Sets";
+    $self->{output_filename} = "analogical_sets.csv";
     #$self->{purpose} = AMGui::Wx::Viewer::RESULTS;
     
     # individual reports are managed by a ResultViewer that keeps them

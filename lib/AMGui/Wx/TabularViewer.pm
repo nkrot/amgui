@@ -17,9 +17,10 @@ our @ISA = ('Wx::ListView', 'AMGui::Wx::Viewer');
 
 use Class::XSAccessor {
     getters => {
-        main           => 'main',
-        colnames       => 'colnames',
-        add_csv_header => 'add_csv_header'
+        main            => 'main',
+        colnames        => 'colnames',
+        add_csv_header  => 'add_csv_header',
+        output_filename => 'output_filename'
     }
 };
 
@@ -39,8 +40,9 @@ sub new {
     $self->{statusbar_message} = '';
     $self->{colnames} = [];
     $self->{add_csv_header} = TRUE;
+    $self->{output_filename} = undef; # subclasses should override it
 
-    $self->{visible} = FALSE; # if the tab is active
+    $self->{visible} = FALSE; # whether the tab is active
 
     return $self;
 }
