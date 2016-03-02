@@ -1,5 +1,6 @@
 package AMGui::Wx::ResultViewer;
 # TODO: perhaps this class should not be under Wx any more
+# and can be renamed to, e.g., ReportManager
 
 use strict;
 use warnings;
@@ -8,8 +9,8 @@ use AMGui::Constant;
 use AMGui::Results;
 
 use AMGui::Wx::Report::Predictions;
-#use AMGui::Wx::Report::AnalogicalSet;
-#use AMGui::Wx::Report::GangsReport;
+use AMGui::Wx::Report::AnalogicalSets;
+#use AMGui::Wx::Report::Gangs;
 
 use Class::XSAccessor {
     getters => {
@@ -29,12 +30,11 @@ sub new {
     $self->{purpose} = AMGui::Wx::Viewer::RESULTS;
     $self->{reports} = []; # an array of active reports
 
-    $self->{predictions} = AMGui::Wx::Report::Predictions->new($main, $self);
-    
+    $self->{predictions}    = AMGui::Wx::Report::Predictions->new($main, $self);
+    $self->{analogicalsets} = AMGui::Wx::Report::AnalogicalSets->new($main, $self);
+
     # DatasetViewer associated with this ResultViewer
     $self->{dataset_viewer} = undef;
-
-    #$self->{notshown} = 0;
 
     return $self;
 }
@@ -50,7 +50,7 @@ sub set_reports {
     # clear all current reports
     # TODO: need to release viewers?
     $self->{reports} = [];
-    
+
     # set new reports
     while (my ($key, $value) = each %$reports) {
         push @{$self->reports}, $key if $value == TRUE;
@@ -86,11 +86,15 @@ sub unset_dataset_viewer {
 sub add {
     my ($self, $result) = @_;
     my $idx = $self->results->add($result);
-    
+
     my $report = $self->{predictions};
     $report->show(TRUE);  # and switch to this very tab
     my $row = $report->add_row($idx, $result);
     $report->focus($row); # highlight the the most recent result
+
+    # fill another report
+    $self->{analogicalsets}->show;
+    $self->{analogicalsets}->add_row($idx, $result);
     
     return $self;
 }
