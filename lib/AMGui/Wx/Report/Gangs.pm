@@ -33,54 +33,54 @@ sub add {
     my ($self, $pos_in_results, $result) = @_;
 
 	my @gangs = @{$result->gang_effects};
-	#warn Dumper(@gangs);
+    #warn Dumper(@gangs);
 
-	# we expect that gangs are sorted by importance, from highest to lowest
-	while (my ($gang_num, $gang) = each(@gangs)) {
-		my @columns;
-		my @colnames unless $self->has_header;
+    # we expect that gangs are sorted by importance, from highest to lowest
+    while (my ($gang_num, $gang) = each(@gangs)) {
+        my @columns;
+        my @colnames unless $self->has_header;
 
-		#
-		# add common columns that describe the test item
-		#
-		
-		# add test item features as separate columns
-		# feature columns will be named F1,F2,..,Fn
-		unless ( $self->has_header ) {
-			push @colnames, map { "F" . ++$_ } 0..$#{$result->test_item->features};
-		}
-		push @columns, @{$result->test_item->features};
+        #
+        # add common columns that describe the test item
+        #
+        
+        # add test item features as separate columns
+        # feature columns will be named F1,F2,..,Fn
+        unless ( $self->has_header ) {
+            push @colnames, map { "F" . ++$_ } 0..$#{$result->test_item->features};
+        }
+        push @columns, @{$result->test_item->features};
 
-		# add the word being classified, conventionally placed in the comment
-		push @colnames, "Comment" unless $self->has_header;
-		push @columns, $result->test_item->comment;
+        # add the word being classified, conventionally placed in the comment
+        push @colnames, "Comment" unless $self->has_header;
+        push @columns, $result->test_item->comment;
 
-		#
-		# gang specific columns
-		#
+        #
+        # gang specific columns
+        #
 
-		# the position of the gang in the set of gangs
-		push @colnames, "Rank" unless $self->has_header;
-		push @columns, 1+$gang_num;
+        # the position of the gang in the set of gangs
+        push @colnames, "Rank" unless $self->has_header;
+        push @columns, 1+$gang_num;
 
-		# add gang features
-		# gang feature columns will be named GF1,GF2,..,GFn
-		unless ($self->has_header) {
-			push @colnames, map { "GF" . ++$_ } 0..$#{$gang->{features}};
-		}
-		push @columns, @{$gang->{features}};
+        # add gang features
+        # gang feature columns will be named GF1,GF2,..,GFn
+        unless ($self->has_header) {
+            push @colnames, map { "GF" . ++$_ } 0..$#{$gang->{features}};
+        }
+        push @columns, @{$gang->{features}};
 
-		# add gang score: absolute value and percentage
-		push @colnames, ("Score", "Score %")  unless $self->has_header;
-		push @columns, ($gang->{score}, 
-						$self->effect_as_pct($gang->{effect})); # TODO: get it from AM
+        # add gang score: absolute value and percentage
+        push @colnames, ("Score", "Score %")  unless $self->has_header;
+        push @columns, ($gang->{score}, 
+                        $self->effect_as_pct($gang->{effect})); # TODO: get it from AM
 
-		# add info about each class
-		my @classes = sort $result->training_set->classes;
-		while (my ($i, $class) = each(@classes)) {
-			unless ($self->has_header) {
-				push @colnames, ("Class " . (1+$i), 
-								 $class . "_ptrs",
+        # add info about each class
+        my @classes = sort $result->training_set->classes;
+        while (my ($i, $class) = each(@classes)) {
+            unless ($self->has_header) {
+                push @colnames, ("Class " . (1+$i), 
+                    			 $class . "_ptrs",
 								 $class . "_pct");
 			}
 			push @columns, ($class,
