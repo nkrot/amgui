@@ -25,7 +25,7 @@ use Class::XSAccessor {
 };
 
 sub new {
-    my ($class, $main) = @_;
+    my ($class, $main, $reports) = @_;
 
     my $self = bless {
         main    => $main,
@@ -41,6 +41,8 @@ sub new {
         wxID_REPORT_GANGS          => "AMGui::Wx::Report::Gangs"
     };
 
+    $self->set_reports($reports) if defined $reports;
+
     return $self;
 }
 
@@ -52,7 +54,10 @@ sub close {
 sub set_reports {
     my ($self, $reports) = @_;
     # clear all current reports
-    # TODO: need to close no longer necessary tabs?
+    # TODO: need to close no longer necessary tabs? or just grey them out
+    #       to show they are no longer used?
+    # TODO: maybe reuse existing reports, create (and populate) a new one
+    # Take int account AMGui::Results
     $self->{reports} = [];
     # set new reports
     foreach my $report_id (@{$self->main->order_of_reports}) {
@@ -115,11 +120,11 @@ sub add {
 
     # and switch to the tab with the first report
     ($self->reports->[0])->show(TRUE);
-    
+
     # highlight the the most recent result
     # TODO: oops, will not work for gangs report. maybe focus_last?
-    #TODO#$report->focus($row); 
-   
+    #TODO#$report->focus($row);
+
     return $self;
 }
 
