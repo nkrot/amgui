@@ -111,11 +111,11 @@ sub add {
 sub effect_as_pct {
     my ($self, $effect_value) = @_;
 	$effect_value = 0 unless defined $effect_value;
-	if ($effect_value > 0) {
+	#if ($effect_value > 0) {
 		return sprintf("%.3f", 100 * $effect_value);
-	} else {
-		return "0";
-	}
+	#} else {
+		#return "0";
+	#}
 }
 
 ######################################################################
