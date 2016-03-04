@@ -59,6 +59,7 @@ sub new {
     };
 
     # NOTE, the keys are *literal Strings*, not numeric values associated with these constants!
+    # This may be confusing and perhaps should be changed
     $self->{reports} = {
         wxID_REPORT_PREDICTION     => TRUE,
         wxID_REPORT_ANALOGICAL_SET => FALSE,
