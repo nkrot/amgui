@@ -32,7 +32,7 @@ sub new {
 sub add {
     my ($self, $pos_in_results, $result) = @_;
 
-	my @gangs = @{$result->gang_effects};
+    my @gangs = @{$result->gang_effects};
     #warn Dumper(@gangs);
 
     # we expect that gangs are sorted by importance, from highest to lowest
@@ -80,24 +80,32 @@ sub add {
         while (my ($i, $class) = each(@classes)) {
             unless ($self->has_header) {
                 push @colnames, ("Class " . (1+$i), 
-                    			 $class . "_ptrs",
-								 $class . "_pct");
-			}
-			push @columns, ($class,
-							$gang->{class}->{$class}->{score} || 0,
-							$self->effect_as_pct($gang->{class}->{$class}->{effect}));
-		}
+                                 $class . "_ptrs",
+                                 $class . "_pct");
+            }
+            push @columns, ($class,
+                            $gang->{class}->{$class}->{score} || 0,
+                            $self->effect_as_pct($gang->{class}->{$class}->{effect}));
+        }
 
-		#
-		# finally, add it all to GUI
-		#
+        # the number of exemplars that contrinute to this gang
+        push @colnames, "Size" unless $self->has_header;
+        push @columns, $gang->{size};
 
-		# set column names
-		$self->add_columns(\@colnames) unless $self->has_header;
+        # homogenous' is about how much variability there is in the gang w.r.t. the class to be predicted.
+        push @colnames, "Homogenous" unless $self->has_header;
+        push @columns, $gang->{homogenous};
 
-		# NOTE: pos_is_results does not affect where the row is inserted
-		$self->SUPER::add_row($pos_in_results, \@columns);
-	}
+        #
+        # finally, add it all to GUI
+        #
+
+        # set column names
+        $self->add_columns(\@colnames) unless $self->has_header;
+
+        # NOTE: pos_is_results does not affect where the row is inserted
+        $self->SUPER::add_row($pos_in_results, \@columns);
+    }
 
     $self->adjust_column_widths;
 
@@ -110,12 +118,12 @@ sub add {
 # TODO: get it from AM
 sub effect_as_pct {
     my ($self, $effect_value) = @_;
-	$effect_value = 0 unless defined $effect_value;
-	#if ($effect_value > 0) {
-		return sprintf("%.3f", 100 * $effect_value);
-	#} else {
-		#return "0";
-	#}
+    $effect_value = 0 unless defined $effect_value;
+    #if ($effect_value > 0) {
+        return sprintf("%.3f", 100 * $effect_value);
+    #} else {
+        #return "0";
+    #}
 }
 
 ######################################################################
