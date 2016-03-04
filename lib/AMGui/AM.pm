@@ -99,17 +99,22 @@ sub classify_all {
 
 sub am_end_test_hook {
     my ($self) = @_;
-    my ($cnt_total, $cnt_correct) = ($self->testing->size, 0);
+
+    my $cnt_total = $self->testing->size;
+    my ($cnt_current, $cnt_correct) = (0, 0);
 
     return sub {
         my ($batch, $test_item, $result) = @_;
+        $cnt_current++;
         $cnt_correct++  if $result->result eq 'correct'; # TODO: AM::Result->is_correct
 
-        my $msg = "Total: " . $cnt_total . "; Correct: " . $cnt_correct;
         $self->result_viewer->add($result);
+        
+        my $msg = join "; ", (
+            "Total: "   . $cnt_total,
+            "Current: " . $cnt_current,
+            "Correct: " . $cnt_correct);
         $self->result_viewer->show_in_statusbar($msg);
-
-        #print $test_item->comment . ' ' . $result->result . "\n";
     }    
 }
 
