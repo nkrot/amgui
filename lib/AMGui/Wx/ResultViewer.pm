@@ -5,6 +5,8 @@ package AMGui::Wx::ResultViewer;
 use strict;
 use warnings;
 
+#use Data::Dumper;
+
 use AMGui::Constant;
 use AMGui::Results;
 
@@ -14,6 +16,7 @@ use AMGui::Wx::Report::Gangs;
 
 use Class::XSAccessor {
     getters => {
+        main           => 'main',
         results        => 'results', # (list of) AMGui::Result
         dataset_viewer => 'dataset_viewer',
         purpose        => 'purpose',
@@ -24,18 +27,19 @@ use Class::XSAccessor {
 sub new {
     my ($class, $main) = @_;
 
-    my $self = bless {}, $class;
+    my $self = bless {
+        main    => $main,
+        results => AMGui::Results->new,
+        purpose => AMGui::Wx::Viewer::RESULTS,
+        reports => [], # an array of active reports
+        dataset_viewer => undef  # DatasetViewer associated with this ResultViewer
+    }, $class;
 
-    $self->{results} = AMGui::Results->new;
-    $self->{purpose} = AMGui::Wx::Viewer::RESULTS;
-    $self->{reports} = []; # an array of active reports
-
-    $self->{predictions}    = AMGui::Wx::Report::Predictions->new($main, $self);
-    $self->{analogicalsets} = AMGui::Wx::Report::AnalogicalSets->new($main, $self);
-    $self->{gangs}          = AMGui::Wx::Report::Gangs->new($main, $self);
-
-    # DatasetViewer associated with this ResultViewer
-    $self->{dataset_viewer} = undef;
+    $self->{report_classes} = {
+        wxID_REPORT_PREDICTION     => "AMGui::Wx::Report::Predictions",
+        wxID_REPORT_ANALOGICAL_SET => "AMGui::Wx::Report::AnalogicalSets",
+        wxID_REPORT_GANGS          => "AMGui::Wx::Report::Gangs"
+    };
 
     return $self;
 }
@@ -45,17 +49,19 @@ sub close {
     $self->unset_dataset_viewer;
 }
 
-# TODO:
 sub set_reports {
     my ($self, $reports) = @_;
     # clear all current reports
-    # TODO: need to release viewers?
+    # TODO: need to close no longer necessary tabs?
     $self->{reports} = [];
-
     # set new reports
-    while (my ($key, $value) = each %$reports) {
-        push @{$self->reports}, $key if $value == TRUE;
+    foreach my $report_id (@{$self->main->order_of_reports}) {
+        if ( $reports->{$report_id} ) {
+            my $class = $self->{report_classes}->{$report_id};
+            push @{$self->reports}, $class->new($self->main, $self);
+        }
     }
+    #warn "The following reports have been set: " . $self->reports;
     return $self;
 }
 
@@ -88,26 +94,32 @@ sub set_classifier {
     return $self;
 }
 
+# return the report that is displayed in the active tab
+#sub active_report {
+#}
+
 ######################################################################
 
 # TODO: problem! when this method is called as a callback from classify_all
 # in order to display results as they are generated, the tab does not get updated
 # until the processing has finished. Statusbar however is updated successfully!
+
 sub add {
     my ($self, $result) = @_;
     my $idx = $self->results->add($result);
 
-    my $report = $self->{predictions};
-    $report->show(TRUE);  # and switch to this very tab
-    my $row = $report->add($idx, $result);
-    $report->focus($row); # highlight the the most recent result
+    foreach my $report (@{$self->reports}) {
+        $report->add($idx, $result);
+        $report->show;
+    }
 
-    # fill other reports
-    $self->{analogicalsets}->show;
-    $self->{analogicalsets}->add($idx, $result);
-    $self->{gangs}->show;
-    $self->{gangs}->add($idx, $result);
+    # and switch to the tab with the first report
+    ($self->reports->[0])->show(TRUE);
     
+    # highlight the the most recent result
+    # TODO: oops, will not work for gangs report. maybe focus_last?
+    #TODO#$report->focus($row); 
+   
     return $self;
 }
 
@@ -117,13 +129,13 @@ sub add {
 
 sub focus {
     my ($self, $idx) = @_;
-    my $report = $self->{predictions}; # TODO: select correct report
+    my $report = $self->{reports}->[0]; # TODO: select correct report
     return $report->focus($idx);
 }
 
 sub show_in_statusbar {
     my ($self, $msg) = @_;
-    my $report = $self->{predictions}; # TODO: select correct report
+    my $report = $self->{reports}->[0]; # TODO: select correct report
     return $report->show_in_statusbar($msg);
 }
 

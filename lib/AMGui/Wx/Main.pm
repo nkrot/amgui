@@ -7,6 +7,7 @@ use Cwd ();
 use File::Slurp;
 use File::Spec;
 use File::Basename;
+#use Data::Dumper;
 
 use Wx qw[:everything];
 use Wx::Locale gettext => '_T';
@@ -34,7 +35,8 @@ use Class::XSAccessor {
         amoptions => 'amoptions',
         reports   => 'reports',
         cwd       => 'cwd',
-        aui       => 'aui'
+        aui       => 'aui',
+        order_of_reports => 'order_of_reports'
     },
 };
 
@@ -65,7 +67,10 @@ sub new {
         wxID_REPORT_ANALOGICAL_SET => FALSE,
         wxID_REPORT_GANGS          => FALSE
     };
-    
+    $self->{order_of_reports} = ["wxID_REPORT_PREDICTION",
+                                 "wxID_REPORT_ANALOGICAL_SET",
+                                 "wxID_REPORT_GANGS"];
+
     #$self->{window_1} = Wx::SplitterWindow->new($self, wxID_ANY);
     #$self->{grid_1} = Wx::Grid->new($self->{window_1}, wxID_ANY);
 
