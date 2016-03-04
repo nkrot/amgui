@@ -82,7 +82,7 @@ sub new {
 
     $self->{aui} = AMGui::Wx::AuiManager->new($self);
 
-    $self->{cwd} = Cwd::cwd();
+    $self->{cwd} = Cwd::cwd;
 
     $self->{menubar} = AMGui::Wx::Menubar->new($self);
     $self->SetMenuBar($self->{menubar}->menubar);
