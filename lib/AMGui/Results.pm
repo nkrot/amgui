@@ -26,54 +26,12 @@ sub add {
     return $count; # position of the newly added item
 }
 
-# TODO: if $part equals 0 then the outputted value is 0.000. is it okey?
+# TODO: if $part equals 0 then the outputted value is 0.000. is it okey? -- yes
 sub to_pct {
     my ($self, $part, $whole) = @_;
     $part = 0 unless defined $part;
     my $percentage_format = '%.3f'; # also defined in Algorithm::AM::Result
     return sprintf($percentage_format, 100 * $part / $whole);
-}
-
-# TODO: unused
-sub as_strings {
-    my ($self, $result) = @_;
-    my $lines = [
-        "Tested item:\n"        . $self->as_string($result->test_item),
-        "Predicted class(es): " . join(",", @{ $result->winners}),
-        ${$result->config_info},
-        ${$result->statistical_summary}
-    ];
-
-    push @{$lines}, "Hoho! I can extract it!";
-
-    my %scores = %{$result->scores};
-    for my $class (sort keys %scores) {
-        push @{$lines}, join("\t", $class,
-                                   %scores{$class},
-                                   $self->to_pct( $scores{$class}, $result->total_points ));
-    }
-
-    return $lines;
-}
-
-# TODO: this is shit! probably no longer used and can be deleted
-# a method for converting to a string should rather be added to the classes handled here
-sub as_string {
-    my ($self, $obj) = @_;
-
-    my $str = undef;
-    if ( $obj->isa("Algorithm::AM::DataSet::Item") ) {
-        $str = $obj->class . ",\t" . join("\t", @{$obj->features}) . "\t," . $obj->comment;
-    } else {
-        # TODO: raise an error?
-    }
-    return $str;
-}
-
-sub last_n {
-    my ($self, $n) = @_;
-    $n = 1 unless defined $n;
-    return @{$self->results}[-$n .. -1];
 }
 
 1;
