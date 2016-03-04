@@ -64,7 +64,7 @@ sub add {
         # the score expressed in %
         # TODO: would be good to get it from AM::Result
         #       use AM::Result::scores_normalized for it?
-        push @columns, AMGui::Results->to_pct($scores{$class}, $result->total_points);
+        push @columns, $self->to_pct($scores{$class}, $result->total_points);
 
         unless ( $self->has_header ) {
             push @colnames, ("Class ". ++$i, "${class}_ptrs", "${class}_pct");
@@ -97,6 +97,14 @@ sub add {
     $self->adjust_column_widths;
 
     return $row;
+}
+
+# TODO: if $part equals 0 then the outputted value is 0.000. is it okey? -- yes
+sub to_pct {
+    my ($self, $part, $whole) = @_;
+    $part = 0 unless defined $part;
+    my $percentage_format = '%.3f'; # also defined in Algorithm::AM::Result
+    return sprintf($percentage_format, 100 * $part / $whole);
 }
 
 ######################################################################
