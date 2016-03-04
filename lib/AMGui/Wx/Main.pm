@@ -513,10 +513,8 @@ sub on_toggle_report_analogical_set {
 sub on_toggle_report_gangs {
     my ($self, $event) = @_;
     my $name = 'wxID_REPORT_GANGS'; # must be a String
-    $self->error("Report Gangs has not yet been implemented");
-    $self->reports->{$name} = FALSE;
-    $self->menubar->Check(wxID_REPORT_GANGS, FALSE); # do not use $name, it is a string
-    #TODO#$self->reports->{$name} = ($event->IsChecked || FALSE);
+    $self->reports->{$name} = ($event->IsChecked || FALSE);
+    #$self->inform("Report Gangs is set to " . $self->reports->{$name});
     return $self->reports->{$name};
 }
 
