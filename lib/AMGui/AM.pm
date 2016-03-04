@@ -7,7 +7,6 @@ use Algorithm::AM;
 use Algorithm::AM::Batch;
 
 use AMGui::Constant;
-use AMGui::Results;
 
 #use Data::Dumper;
 
