@@ -90,12 +90,12 @@ sub add {
 
     my $report = $self->{predictions};
     $report->show(TRUE);  # and switch to this very tab
-    my $row = $report->add_row($idx, $result);
+    my $row = $report->add($idx, $result);
     $report->focus($row); # highlight the the most recent result
 
     # fill other reports
     $self->{analogicalsets}->show;
-    $self->{analogicalsets}->add_row($idx, $result);
+    $self->{analogicalsets}->add($idx, $result);
     $self->{gangs}->show;
     $self->{gangs}->add($idx, $result);
     

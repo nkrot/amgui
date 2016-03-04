@@ -27,7 +27,7 @@ sub new {
     return $self;
 }
 
-sub add_row {
+sub add {
     my ($self, $pos_in_results, $result) = @_;
 
 #   warn "Inserting at pos=" . $pos_in_results;

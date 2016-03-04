@@ -29,7 +29,7 @@ sub new {
     return $self;
 }
 
-sub add_row {
+sub add {
     my ($self, $pos_in_results, $result) = @_;
 
     #warn "Analogical Set=" . Dumper($result->analogical_set);
