@@ -112,7 +112,7 @@ sub new {
     Wx::Event::EVT_MENU($self, wxID_RUN_LINEAR,        \&on_toggle_linear);
     Wx::Event::EVT_MENU($self, wxID_RUN_INCLUDE_NULLS, \&on_toggle_include_nulls);
     Wx::Event::EVT_MENU($self, wxID_RUN_INCLUDE_GIVEN, \&on_toggle_include_given);
-    
+
     # menu Window
     Wx::Event::EVT_MENU($self, wxID_NEXT_TAB,      \&on_next_tab);
     Wx::Event::EVT_MENU($self, wxID_PREV_TAB,      \&on_previous_tab);
@@ -399,7 +399,7 @@ sub on_run_batch {
     my $curr_page = $self->notebook->get_current_page;
 
     return 0 unless $curr_page; # TODO: report an error?
-  
+
     #warn "Purpose:" . $curr_page->purpose;
 
     # TODO: fix this warning: Use of uninitialized value in string eq at
@@ -440,8 +440,7 @@ sub on_run_batch {
         # TODO: recycle existing result viewer?
         # be careful! newly created ResultViewer must not override other ResultViewers
         # that may already be associated with the dataset viewer
-        my $result_viewer = AMGui::Wx::ResultViewer->new($self);
-        $result_viewer->set_reports($self->reports);
+        my $result_viewer = AMGui::Wx::ResultViewer->new($self, $self->reports);
 
         my $am = AMGui::AM->new($self->amoptions);
         $am->set_training($dv_testing->training)->set_testing($dv_testing->dataset);
@@ -517,7 +516,8 @@ sub classify_item {
         # a ResultViewer associated with it, the latter will be reused. Otherwise
         # we create one and associate it with DatasetViewer.
         unless (defined $dataset_viewer->result_viewer) {
-            $dataset_viewer->set_result_viewer( AMGui::Wx::ResultViewer->new($self) );
+            my $result_viewer = AMGui::Wx::ResultViewer->new($self, $self->reports);
+            $dataset_viewer->set_result_viewer($result_viewer);
         }
 
         # finally, create a classifier and run it
