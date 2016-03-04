@@ -81,6 +81,15 @@ sub unset_dataset_viewer {
     return 1;
 }
 
+sub set_classifier {
+    my ($self, $classifier) = @_;
+    $self->{classifier} = $classifier;
+    $classifier->set_result_viewer($self);
+    return $self;
+}
+
+######################################################################
+
 # TODO: problem! when this method is called as a callback from classify_all
 # in order to display results as they are generated, the tab does not get updated
 # until the processing has finished. Statusbar however is updated successfully!
@@ -99,13 +108,6 @@ sub add {
     $self->{gangs}->show;
     $self->{gangs}->add($idx, $result);
     
-    return $self;
-}
-
-sub set_classifier {
-    my ($self, $classifier) = @_;
-    $self->{classifier} = $classifier;
-    $classifier->set_result_viewer($self);
     return $self;
 }
 
