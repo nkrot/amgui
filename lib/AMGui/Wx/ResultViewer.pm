@@ -10,7 +10,7 @@ use AMGui::Results;
 
 use AMGui::Wx::Report::Predictions;
 use AMGui::Wx::Report::AnalogicalSets;
-#use AMGui::Wx::Report::Gangs;
+use AMGui::Wx::Report::Gangs;
 
 use Class::XSAccessor {
     getters => {
@@ -32,6 +32,7 @@ sub new {
 
     $self->{predictions}    = AMGui::Wx::Report::Predictions->new($main, $self);
     $self->{analogicalsets} = AMGui::Wx::Report::AnalogicalSets->new($main, $self);
+    $self->{gangs}          = AMGui::Wx::Report::Gangs->new($main, $self);
 
     # DatasetViewer associated with this ResultViewer
     $self->{dataset_viewer} = undef;
@@ -92,9 +93,11 @@ sub add {
     my $row = $report->add_row($idx, $result);
     $report->focus($row); # highlight the the most recent result
 
-    # fill another report
+    # fill other reports
     $self->{analogicalsets}->show;
     $self->{analogicalsets}->add_row($idx, $result);
+    $self->{gangs}->show;
+    $self->{gangs}->add($idx, $result);
     
     return $self;
 }
