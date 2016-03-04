@@ -17,7 +17,7 @@ use Class::XSAccessor {
         training      => 'training',      # training dataset, AM::DataSet
         testing       => 'testing',       # testing dataset, AM::DataSet
         result        => 'result',        # last result, AM::Result
-        result_viewer => 'result_viewer', # many results, AMGui::Results
+        result_viewer => 'result_viewer', # holds classification results (AM::Result) and manages reports
         options       => 'options'        # a hash of options that AM accepts (linear, include_nulls, include_given)
     },
     setters => {
