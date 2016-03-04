@@ -7,7 +7,9 @@ use Cwd ();
 use File::Slurp;
 use File::Spec;
 use File::Basename;
-#use Data::Dumper;
+use Try::Tiny;
+
+use Data::Dumper;
 
 use Wx qw[:everything];
 use Wx::Locale gettext => '_T';
@@ -597,10 +599,18 @@ sub setup_data_viewers {
     my @data_viewers = ();
     my $training;
 
+    # TODO: if we are loading a project ('data' and 'test')
+    # and at least one of the files fails to load, do not
+    # setup any viewers. we need either all or none.
     for (my $idx=0; $idx <= $#$files; $idx++) {
-        my $dv = $self->setup_data_viewer($files->[$idx], $dataset_types->[$idx]);
-        push @data_viewers, $dv;
-        $training = $dv->dataset  if $dv->dataset->is_training;
+        my $dv = $self->setup_data_viewer($files->[$idx],
+                                          $dataset_types->[$idx]);
+        if ($dv) {
+            push @data_viewers, $dv;
+            if ($dv->dataset->is_training) {
+                $training = $dv->dataset;
+            }
+        }
     }
 
     # each test dataset must be linked to corresponding training dataset
@@ -633,17 +643,29 @@ dataset_purpose is either 'training' or 'testing'
 
 sub setup_data_viewer {
     my ($self, $file, $dataset_purpose) = @_;
+    my $dataset_viewer;
 
-    # load exemplars from file
-    my %args = (
-        path   => $file,
-        format => 'commas'  # TODO: set it from GUI control or from file extension?
-    );
-    my $dataset = AMGui::DataSet->new(%args);
-    $dataset->set_purpose($dataset_purpose) if defined $dataset_purpose;
+    my $dataset = try {
+        # load exemplars from file
+        my %args = (
+            path   => $file,
+            # TODO: set format from GUI control or from file extension?
+            format => 'commas'
+        );
+        return AMGui::DataSet->new(%args);
+    } catch {
+        my $msg = "Error in file $file:\n\n" . $_;
+        $self->error($msg);
+        return undef;
+    };
 
-    # GUI component for showing exemplars
-    my $dataset_viewer = AMGui::Wx::DatasetViewer->new($self, $dataset);
+    if (defined $dataset) {
+        if (defined $dataset_purpose) {
+            $dataset->set_purpose($dataset_purpose);
+        }
+        # GUI component for showing exemplars
+        $dataset_viewer = AMGui::Wx::DatasetViewer->new($self, $dataset);
+    }
 
     return $dataset_viewer;
 }
