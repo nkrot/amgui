@@ -92,7 +92,7 @@ sub add {
         push @colnames, "Size" unless $self->has_header;
         push @columns, $gang->{size};
 
-        # homogenous' is about how much variability there is in the gang w.r.t. the class to be predicted.
+        # 'homogenous' is about how much variability there is in the gang w.r.t. the class to be predicted.
         push @colnames, "Homogenous" unless $self->has_header;
         push @columns, $gang->{homogenous};
 
