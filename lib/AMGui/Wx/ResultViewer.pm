@@ -8,7 +8,6 @@ use warnings;
 #use Data::Dumper;
 
 use AMGui::Constant;
-use AMGui::Results;
 
 use AMGui::Wx::Report::Predictions;
 use AMGui::Wx::Report::AnalogicalSets;
@@ -17,7 +16,7 @@ use AMGui::Wx::Report::Gangs;
 use Class::XSAccessor {
     getters => {
         main           => 'main',
-        results        => 'results', # (list of) AMGui::Result
+        results        => 'results',
         dataset_viewer => 'dataset_viewer',
         purpose        => 'purpose',
         reports        => 'reports'
@@ -29,9 +28,9 @@ sub new {
 
     my $self = bless {
         main    => $main,
-        results => AMGui::Results->new,
         purpose => AMGui::Wx::Viewer::RESULTS,
         reports => [], # an array of active reports
+        results => [], # (arrayref of) AM::Result objects
         dataset_viewer => undef  # DatasetViewer associated with this ResultViewer
     }, $class;
 
@@ -57,7 +56,7 @@ sub set_reports {
     # TODO: need to close no longer necessary tabs? or just grey them out
     #       to show they are no longer used?
     # TODO: maybe reuse existing reports, create (and populate) a new one
-    # Take int account AMGui::Results
+    # Take into account Results
     $self->{reports} = [];
     # set new reports
     foreach my $report_id (@{$self->main->order_of_reports}) {
@@ -108,13 +107,14 @@ sub set_classifier {
 # TODO: problem! when this method is called as a callback from classify_all
 # in order to display results as they are generated, the tab does not get updated
 # until the processing has finished. Statusbar however is updated successfully!
-
 sub add {
     my ($self, $result) = @_;
-    my $idx = $self->results->add($result);
 
+    my $last = -1 + push(@{$self->results}, $result);
+
+    # add the newly added item to GUI (reports)
     foreach my $report (@{$self->reports}) {
-        $report->add($idx, $result);
+        $report->add($last, $result);
         $report->show;
     }
 
