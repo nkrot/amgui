@@ -88,11 +88,11 @@ sub add {
                             $self->effect_as_pct($gang->{class}->{$class}->{effect}));
         }
 
-        # the number of exemplars that contrinute to this gang
+        # the number of exemplars (from training) that contribute to this gang
         push @colnames, "Size" unless $self->has_header;
         push @columns, $gang->{size};
 
-        # 'homogenous' is about how much variability there is in the gang w.r.t. the class to be predicted.
+        # 'homogenous' is ...?
         push @colnames, "Homogenous" unless $self->has_header;
         push @columns, $gang->{homogenous};
 
