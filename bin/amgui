@@ -1,0 +1,35 @@
+#!/bin/sh
+
+# # #
+# This script is valid for non-cpan install of amgui
+#
+
+# path to this very script
+bindir=`cd "$(dirname "${BASH_SOURCE[0]}")" && pwd`
+# path to library
+libdir="$bindir/../lib"
+
+perlver=perl-5.22.1
+
+if [ -d "$libdir" ]; then
+
+	# switch to using the correct version of perl
+	export PERLBREW_ROOT=$HOME/perl5/perlbrew
+	export PERLBREW_HOME=$HOME/.perlbrew
+	source ${PERLBREW_ROOT}/etc/bashrc
+
+	perlbrew use $perlver
+	kode=$?
+	if [ $kode -ne 0 ]; then
+		echo "Could not switch to using $perlver"
+		exit $kode
+	fi
+
+	# update path to libs
+	export PERL5LIB="$libdir:$PERL5LIB"
+
+	# launch the GUI app
+	perl $bindir/amgui.pl
+else
+	echo "OOps" >&2
+fi
