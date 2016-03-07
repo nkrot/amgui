@@ -24,6 +24,7 @@ use AMGui::Wx::ResultViewer;
 use AMGui::Wx::Menubar;
 use AMGui::Wx::Notebook;
 use AMGui::Wx::StatusBar;
+use AMGui::Wx::ProgressBar;
 
 our @ISA = 'Wx::Frame';
 
@@ -447,10 +448,19 @@ sub on_run_batch {
         my $am = AMGui::AM->new($self->amoptions);
         $am->set_training($dv_testing->training)->set_testing($dv_testing->dataset);
         $am->set_result_viewer($result_viewer);
+        $am->set_progressbar($self->make_progressbar($dv_testing));
         $am->classify_all;
     }
 
     return 1;
+}
+
+sub make_progressbar {
+    my ($self, $parent) = @_;
+    return sub {
+        warn "Parent is: ". ref($parent);
+        AMGui::Wx::ProgressBar->new($parent, shift(), shift(), shift())
+    }
 }
 
 sub on_run_next_item {
