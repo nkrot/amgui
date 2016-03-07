@@ -458,7 +458,6 @@ sub on_run_batch {
 sub make_progressbar {
     my ($self, $parent) = @_;
     return sub {
-        warn "Parent is: ". ref($parent);
         AMGui::Wx::ProgressBar->new($parent, shift(), shift(), shift())
     }
 }
