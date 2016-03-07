@@ -17,10 +17,12 @@ use Class::XSAccessor {
         testing       => 'testing',       # testing dataset, AM::DataSet
         result        => 'result',        # last result, AM::Result
         result_viewer => 'result_viewer', # holds classification results (AM::Result) and manages reports
-        options       => 'options'        # a hash of options that AM accepts (linear, include_nulls, include_given)
+        options       => 'options',       # a hash of options that AM accepts (linear, include_nulls, include_given)
+        progressbar   => 'progressbar'
     },
     setters => {
-        set_result_viewer => 'result_viewer'
+        set_result_viewer => 'result_viewer',
+        set_progressbar   => 'progressbar'
     }
 };
 
@@ -30,6 +32,7 @@ sub new {
     my $self = bless {
         options => {%$opts} # copy options
     }, $class;
+    $self->{progressbar} = undef;
 
     return $self;
 }
@@ -66,7 +69,7 @@ sub close {
 # Classify given test item using preset training set
 sub classify {
     my ($self, $test_item) = @_;
-    
+
     my %options = ((
         training_set => $self->training->data
     ), %{$self->options});
@@ -86,11 +89,19 @@ sub classify_all {
 
     my %options = ((
         training_set  => $self->training->data,
-        end_test_hook => $self->am_end_test_hook
+        end_test_hook => $self->am_end_test_hook,
     ), %{$self->options});
-    
+
     $self->{classifier} = Algorithm::AM::Batch->new(%options);
+
+    if (defined $self->progressbar) {
+        $self->{progressbar} = $self->progressbar->("Classifying",
+                                                    "Starting...", 
+                                                    $self->testing->size);
+    }
+
     $self->classifier->classify_all( $self->testing->data );
+    #TODO#$self->result_viewer->show_reports;
     $self->result_viewer->focus(0);
 
     return 1;
@@ -108,13 +119,23 @@ sub am_end_test_hook {
         $cnt_correct++  if $result->result eq 'correct'; # TODO: AM::Result->is_correct
 
         $self->result_viewer->add($result);
-        
+
+        # TODO: maybe worth removing, because the same is shown in ProgressBar
+        # However when processing completes and the ProgressBar closes,
+        # the figures must be shown in the StatusBar.
         my $msg = join "; ", (
             "Total: "   . $cnt_total,
             "Current: " . $cnt_current,
             "Correct: " . $cnt_correct);
         $self->result_viewer->show_in_statusbar($msg);
-    }    
+
+        if (defined $self->progressbar) {
+            $msg = join ", ", ("Total: "               . $cnt_total,
+                               "so far: "              . $cnt_current,
+                               "correctly predicted: " . $cnt_correct);
+            $self->progressbar->Update($cnt_current, $msg);
+        }
+    }
 }
 
 1;
