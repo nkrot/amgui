@@ -5,7 +5,7 @@ package AMGui::Wx::ResultViewer;
 use strict;
 use warnings;
 
-#use Data::Dumper;
+use Data::Dumper;
 
 use AMGui::Constant;
 
@@ -62,7 +62,8 @@ sub set_reports {
     foreach my $report_id (@{$self->main->order_of_reports}) {
         if ( $reports->{$report_id} ) {
             my $class = $self->{report_classes}->{$report_id};
-            push @{$self->reports}, $class->new($self->main, $self);
+            #push @{$self->reports}, $class->new($self->main, $self); # TODO: delay creation of a report
+            push @{$self->reports}, $class; # delay creation of a report
         }
     }
     #warn "The following reports have been set: " . $self->reports;
@@ -104,27 +105,58 @@ sub set_classifier {
 
 ######################################################################
 
-# TODO: problem! when this method is called as a callback from classify_all
-# in order to display results as they are generated, the tab does not get updated
-# until the processing has finished. Statusbar however is updated successfully!
 sub add {
     my ($self, $result) = @_;
 
     my $last = -1 + push(@{$self->results}, $result);
 
-    # add the newly added item to GUI (reports)
-    foreach my $report (@{$self->reports}) {
-        $report->add($last, $result);
-        $report->show;
+    # add the newly added item to GUI (all reports)
+#    foreach my $report (@{$self->reports}) {
+#        $report->add($last, $result);
+#        $report->show;
+#    }
+
+    if ($self->reports->[0]->can("new")) {
+        warn "Creating the 1st report";
+        ${$self->reports}[0] = $self->reports->[0]->new($self->main, $self);
+        warn ref($self->reports->[0]);
     }
+    
+    #$report->new($self->main, $self);
+    
+    # update the first report only.
+    # other reports will be generated later. presumably this will improve
+    # performance and user experience.
+    my $report = $self->reports->[0];
+    
+    $report->add($last, $result);
 
     # and switch to the tab with the first report
-    ($self->reports->[0])->show(TRUE);
+    $report->show(TRUE);
 
     # highlight the the most recent result
     # TODO: oops, will not work for gangs report. maybe focus_last?
     #TODO#$report->focus($row);
 
+    return $self;
+}
+
+# build
+sub show_reports {
+    my ($self) = @_;
+
+    while (my ($report_idx, $report) = each(@{$self->reports})) {
+        # skip the 1st report as it was already built in add method
+        next if $report_idx == 0;
+        
+        warn "Generating report: " . $report_idx;
+        
+        while (my ($result_id, $result) = each(@{$self->results})) {
+            $report->add($result_id, $result);
+        }
+        $report->show;        
+    }
+    
     return $self;
 }
 

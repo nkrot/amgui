@@ -103,9 +103,7 @@ sub classify_all {
 
     $self->classifier->classify_all( $self->testing->data );
 
-    #TODO: build other reports from existing results
-    #TODO#$self->result_viewer->show_reports;
-
+    $self->result_viewer->show_reports;
     $self->result_viewer->focus(0);
 
     return 1;
