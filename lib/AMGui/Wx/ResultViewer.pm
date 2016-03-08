@@ -5,7 +5,7 @@ package AMGui::Wx::ResultViewer;
 use strict;
 use warnings;
 
-use Data::Dumper;
+#use Data::Dumper;
 
 use AMGui::Constant;
 
@@ -52,21 +52,22 @@ sub close {
 
 sub set_reports {
     my ($self, $reports) = @_;
-    # clear all current reports
     # TODO: need to close no longer necessary tabs? or just grey them out
     #       to show they are no longer used?
-    # TODO: maybe reuse existing reports, create (and populate) a new one
+    # TODO: instead of clearing all reports, need to keep those that already
+    #       exit
     # Take into account Results
     $self->{reports} = [];
     # set new reports
     foreach my $report_id (@{$self->main->order_of_reports}) {
         if ( $reports->{$report_id} ) {
-            my $class = $self->{report_classes}->{$report_id};
-            #push @{$self->reports}, $class->new($self->main, $self); # TODO: delay creation of a report
-            push @{$self->reports}, $class; # delay creation of a report
+            push @{$self->reports}, {
+                class  => $self->{report_classes}->{$report_id},
+                object => undef,
+                state  => FALSE # unused for the time being
+            };
         }
     }
-    #warn "The following reports have been set: " . $self->reports;
     return $self;
 }
 
@@ -103,6 +104,17 @@ sub set_classifier {
 #sub active_report {
 #}
 
+# return the report by the given index
+# If the report does not exist, create it
+sub get_report {
+    my ($self, $idx) = @_;
+    my $report_data  = $self->reports->[$idx];
+    unless ( defined $report_data->{object} ) {
+        $report_data->{object} = $report_data->{class}->new($self->main, $self);
+    }
+    return $report_data->{object};
+}
+
 ######################################################################
 
 sub add {
@@ -110,29 +122,15 @@ sub add {
 
     my $last = -1 + push(@{$self->results}, $result);
 
-    # add the newly added item to GUI (all reports)
-#    foreach my $report (@{$self->reports}) {
-#        $report->add($last, $result);
-#        $report->show;
-#    }
-
-    if ($self->reports->[0]->can("new")) {
-        warn "Creating the 1st report";
-        ${$self->reports}[0] = $self->reports->[0]->new($self->main, $self);
-        warn ref($self->reports->[0]);
+    # prepare tabs for the reports
+    for (my $idx=0; $idx < scalar @{$self->reports}; $idx ++) {
+        $self->get_report($idx)->show;
     }
-    
-    #$report->new($self->main, $self);
-    
-    # update the first report only.
-    # other reports will be generated later. presumably this will improve
-    # performance and user experience.
-    my $report = $self->reports->[0];
-    
-    $report->add($last, $result);
 
-    # and switch to the tab with the first report
-    $report->show(TRUE);
+    my $report = $self->get_report(0);
+    $report->show(TRUE); # and switch to the tab with the first report
+
+    $report->add($last, $result);
 
     # highlight the the most recent result
     # TODO: oops, will not work for gangs report. maybe focus_last?
@@ -141,22 +139,18 @@ sub add {
     return $self;
 }
 
-# build
+# TODO: preferably do it in the background so that the users can work
+# with other tabs
 sub show_reports {
     my ($self) = @_;
-
-    while (my ($report_idx, $report) = each(@{$self->reports})) {
-        # skip the 1st report as it was already built in add method
-        next if $report_idx == 0;
-        
-        warn "Generating report: " . $report_idx;
-        
-        while (my ($result_id, $result) = each(@{$self->results})) {
+    # skip the very 1st report since it was already built in add method
+    for (my $idx = 1; $idx < scalar @{$self->reports}; $idx++) {
+        my $report = $self->get_report($idx);
+        while ( my ($result_id, $result) = each(@{$self->results}) ) {
             $report->add($result_id, $result);
         }
-        $report->show;        
+        #$report->show;
     }
-    
     return $self;
 }
 
@@ -166,13 +160,13 @@ sub show_reports {
 
 sub focus {
     my ($self, $idx) = @_;
-    my $report = $self->{reports}->[0]; # TODO: select correct report
+    my $report = $self->get_report(0); # TODO: select correct report
     return $report->focus($idx);
 }
 
 sub show_in_statusbar {
     my ($self, $msg) = @_;
-    my $report = $self->{reports}->[0]; # TODO: select correct report
+    my $report = $self->get_report(0); # TODO: select correct report
     return $report->show_in_statusbar($msg);
 }
 
